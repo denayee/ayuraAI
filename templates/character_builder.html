@@ -1,0 +1,162 @@
+{% extends 'home.html' %}
+
+{% block home %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/character.css') }}">
+
+<div class="builder-container">
+    <div class="builder-card">
+        <h2 class="builder-title">Welcome, {{ session.get('name', 'User') }}! <br>Create Your Avatar</h2>
+        <p class="builder-subtitle">Define your unique skin & hair profile for personalized AI care.</p>
+
+        <form action="{{ url_for('character_builder.character_builder') }}" method="POST" class="builder-form">
+            
+            <!-- SECTION 1: SKIN -->
+            <div class="section-title">✨ Skin Profile</div>
+            <div class="form-grid">
+                
+                <div class="form-group">
+                    <label>Skin Type</label>
+                    <select name="skin_type" required>
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="Oily">Oily</option>
+                        <option value="Dry">Dry</option>
+                        <option value="Combination">Combination</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Sensitive">Sensitive</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Skin Color</label>
+                    <div class="color-options">
+                        <label class="color-option" style="background-color: #F8D9C6;">
+                            <input type="radio" name="skin_color" value="Fair" required>
+                        </label>
+                        <label class="color-option" style="background-color: #E0AC84;">
+                            <input type="radio" name="skin_color" value="Medium">
+                        </label>
+                        <label class="color-option" style="background-color: #C68642;">
+                            <input type="radio" name="skin_color" value="Olive">
+                        </label>
+                        <label class="color-option" style="background-color: #8D5524;">
+                            <input type="radio" name="skin_color" value="Brown">
+                        </label>
+                        <label class="color-option" style="background-color: #3B2219;">
+                            <input type="radio" name="skin_color" value="Dark">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label>Concern Areas</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="skin_problems" value="Acne"> Acne</label>
+                        <label><input type="checkbox" name="skin_problems" value="Pigmentation"> Pigmentation</label>
+                        <label><input type="checkbox" name="skin_problems" value="Dark Circles"> Dark Circles</label>
+                        <label><input type="checkbox" name="skin_problems" value="Wrinkles"> Wrinkles</label>
+                        <label><input type="checkbox" name="skin_problems" value="Redness"> Redness</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Sensitivity Level</label>
+                    <input type="range" name="sensitivity_level" min="1" max="5" step="1" list="sensitivity-markers">
+                    <datalist id="sensitivity-markers">
+                        <option value="1" label="Low"></option>
+                        <option value="2"></option>
+                        <option value="3" label="Med"></option>
+                        <option value="4"></option>
+                        <option value="5" label="High"></option>
+                    </datalist>
+                    <div class="range-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SECTION 2: HAIR -->
+            <div class="section-title">💇‍♀️ Hair Profile</div>
+            <div class="form-grid">
+                
+                <div class="form-group">
+                    <label>Hair Type</label>
+                    <select name="hair_type" required>
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="Straight">Straight</option>
+                        <option value="Wavy">Wavy</option>
+                        <option value="Curly">Curly</option>
+                        <option value="Coily">Coily</option>
+                    </select>
+                </div>
+
+                 <div class="form-group">
+                    <label>Hair Color</label>
+                    <div class="color-options">
+                        <label class="color-option" style="background-color: #090806;">
+                            <input type="radio" name="hair_color" value="Black" required>
+                        </label>
+                        <label class="color-option" style="background-color: #3B3024;">
+                            <input type="radio" name="hair_color" value="Dark Brown">
+                        </label>
+                        <label class="color-option" style="background-color: #B55239;">
+                            <input type="radio" name="hair_color" value="Red">
+                        </label>
+                        <label class="color-option" style="background-color: #E6CEA8;">
+                            <input type="radio" name="hair_color" value="Blonde">
+                        </label>
+                        <label class="color-option" style="background-color: #A7856A;">
+                            <input type="radio" name="hair_color" value="Light Brown">
+                        </label>
+                         <label class="color-option" style="background-color: #E5E5E5;">
+                            <input type="radio" name="hair_color" value="Grey/White">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label>Hair Concerns</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="hair_problems" value="Hairfall"> Hairfall</label>
+                        <label><input type="checkbox" name="hair_problems" value="Dandruff"> Dandruff</label>
+                        <label><input type="checkbox" name="hair_problems" value="Split Ends"> Split Ends</label>
+                        <label><input type="checkbox" name="hair_problems" value="Frizzy"> Frizzy</label>
+                        <label><input type="checkbox" name="hair_problems" value="Breatkage"> Breakage</label>
+                    </div>
+                </div>
+
+                 <div class="form-group">
+                    <label>Scalp Condition</label>
+                    <select name="scalp_condition" required>
+                         <option value="" disabled selected>Select Condition</option>
+                        <option value="Oily">Oily</option>
+                        <option value="Dry">Dry</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Flaky">Flaky</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- SECTION 3: ALLERGIES -->
+            <div class="section-title">🚫 Allergies</div>
+            <div class="form-group full">
+                <label>Do you have any known allergies?</label>
+                <div class="checkbox-group wide">
+                    <label><input type="checkbox" name="allergies" value="Peanuts"> Peanuts</label>
+                    <label><input type="checkbox" name="allergies" value="Dairy"> Dairy</label>
+                    <label><input type="checkbox" name="allergies" value="Gluten"> Gluten</label>
+                    <label><input type="checkbox" name="allergies" value="Latex"> Latex</label>
+                    <label><input type="checkbox" name="allergies" value="Fragrance"> Fragrance</label>
+                     <label><input type="checkbox" name="allergies" value="Aloe Vera"> Aloe Vera</label>
+                    <label><input type="checkbox" name="allergies" value="Coconut"> Coconut</label>
+                     <label><input type="checkbox" name="allergies" value="Sulphates"> Sulphates</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-create">✨ Generate My Profile</button>
+        </form>
+    </div>
+</div>
+{% endblock home %}

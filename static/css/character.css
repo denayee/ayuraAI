@@ -1,0 +1,201 @@
+/* Character Builder Game-Like Styles */
+
+.builder-container {
+    background: linear-gradient(135deg, #eef7f6 0%, #ffffff 100%);
+    min-height: 100vh;
+    padding: 60px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.builder-card {
+    background: white;
+    width: 100%;
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(47, 143, 131, 0.15);
+    padding: 40px;
+    border: 2px solid #ebf5f4;
+}
+
+.builder-title {
+    color: #2f8f83;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 10px;
+    font-family: 'Arial Rounded MT Bold', 'Seg, sans-serif'; 
+}
+
+.builder-subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 30px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed #4ccfc0;
+    font-weight: bold;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full {
+    grid-column: span 2;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #444;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+select, input[type="text"], input[type="number"] {
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fcfcfc;
+}
+
+select:focus, input:focus {
+    border-color: #2f8f83;
+    box-shadow: 0 0 0 3px rgba(47, 143, 131, 0.1);
+    outline: none;
+}
+
+/* Color Options Game Style */
+.color-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    border: 3px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option input {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.color-option:has(input:checked) {
+    border-color: #2f8f83;
+    transform: scale(1.15);
+    box-shadow: 0 0 10px rgba(47, 143, 131, 0.4);
+}
+
+/* Checkboxes & Pills */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.checkbox-group.wide {
+    gap: 15px;
+}
+
+.checkbox-group label {
+    background-color: #f5f5f5;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: normal;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    display: flex; /* Fix alignment */
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-group label:has(input:checked) {
+    background-color: #e0f2f1;
+    color: #2f8f83;
+    border-color: #2f8f83;
+    font-weight: bold;
+}
+
+/* Range Slider */
+input[type=range] {
+    width: 100%;
+    accent-color: #2f8f83;
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* Create Button */
+.btn-create {
+    width: 100%;
+    margin-top: 40px;
+    padding: 16px;
+    background: linear-gradient(45deg, #2f8f83, #4ccfc0);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(47, 143, 131, 0.3);
+}
+
+.btn-create:active {
+    transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-group.full {
+        grid-column: span 1;
+    }
+    .builder-card {
+        padding: 20px;
+    }
+}

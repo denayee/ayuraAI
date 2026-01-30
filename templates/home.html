@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AyuraAI | Smart Beauty Recommendation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+        <a href="{{ url_for('home') }}" style="text-decoration: none;"><h1 class="logo">AyuraAI</h1></a>
+        <nav>
+            <a href="#features">Features</a>
+            <a href="#how">How It Works</a>
+            <a href="#contact">Contact</a>
+            
+            {% if 'user_id' in session %}
+                <div class="user-menu">
+                    <div class="user-avatar" id="avatar-btn">
+                        {{ session.get('name', 'U')[0] | upper }}
+                    </div>
+                    <div class="dropdown-menu">
+                        {% if not session.get('profile_complete') %}
+                            <a href="{{ url_for('character_builder.character_builder') }}">Complete Profile</a>
+                        {% endif %}
+                        <a href="{{ url_for('login.logout') }}">Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('login.login') }}">Login</a>
+                <a href="{{ url_for('register.register') }}" class="btn">Get Started</a>
+            {% endif %}
+        </nav>
+    </header>
+<!-- now this is extend body to another page -->
+{% block home %}
+    
+{% endblock home %}
+
+
+
+
+
+
+     <!-- Footer -->
+    <footer id="contact" class="footer">
+        <p>© 2026 AyuraAI | AI-Based Cosmetic & Home Remedy System</p>
+    </footer>
+
+</body>
+</html>

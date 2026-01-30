@@ -1,0 +1,20 @@
+{% extends 'home.html' %}
+
+{% block home %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_recomodation.css') }}">
+
+<div class="recommendation-container">
+    <h1>Welcome, {{ session.get('name', 'User') }}</h1>
+</div>
+
+{% if profile_incomplete %}
+<div class="popup-overlay">
+    <div class="popup-box">
+        <h2>Complete Your Profile!</h2>
+        <p>To get personalized AI recommendations, we need to know your skin and hair type.</p>
+        <a href="{{ url_for('character_builder.character_builder') }}" class="btn-popup">Create Profile Now</a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock home %}

@@ -1,0 +1,67 @@
+{% extends 'home.html' %}
+{% block home %}
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-text">
+            <h2>AI-Powered Beauty & Home Remedy Recommendations</h2>
+            <p>
+                Get personalized cosmetic product and natural home remedy
+                recommendations based on your skin type, hair condition, and allergies.
+            </p>
+            <a href="{{ url_for('register.register') }}" class="btn-primary">Start Free Analysis</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2>Key Features</h2>
+        <div class="feature-grid">
+
+            <div class="feature-card">
+                <h3>🧠 AI Personalization</h3>
+                <p>Smart analysis of skin and hair type using machine learning.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>🛡️ Allergy Safety</h3>
+                <p>Avoids harmful ingredients and suggests safe alternatives.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>💄 Cosmetic Products</h3>
+                <p>Recommends dermatologist-safe and suitable beauty products.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>🌿 Home Remedies</h3>
+                <p>Natural, chemical-free remedies using common ingredients.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>📋 Usage Guide</h3>
+                <p>Step-by-step instructions for application and preparation.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>⚡ Fast & Simple</h3>
+                <p>Easy forms, quick results, and clean user experience.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how" class="how-it-works">
+        <h2>How It Works</h2>
+        <ol>
+            <li>User enters skin, hair, and allergy details</li>
+            <li>AI analyzes the input</li>
+            <li>System filters unsafe ingredients</li>
+            <li>Personalized recommendations are generated</li>
+        </ol>
+    </section>
+
+   
+    
+{% endblock home %}
