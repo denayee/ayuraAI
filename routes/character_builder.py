@@ -90,3 +90,6 @@ def character_builder():
         return redirect(url_for("recommendation.recommendation"))
 
     return render_template("character_builder.html")
+
+
+# just try
