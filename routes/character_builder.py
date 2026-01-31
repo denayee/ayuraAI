@@ -95,3 +95,9 @@ def character_builder():
 # just try
 # jgpsjgpesjg
 # lsngisejg
+
+
+# flwhf# lsnfgslnfg# lsnglsnglsng
+# lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
+# lsnglsnglsng# lsnglsnglsng# lsnglsng
+# lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
