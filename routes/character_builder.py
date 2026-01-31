@@ -101,3 +101,10 @@ def character_builder():
 # lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
 # lsnglsnglsng# lsnglsnglsng# lsnglsng
 # lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
+
+
+# hi third try
+# lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
+# lsnglsnglsng# lsnglsnglsng# lsnglsng
+
+# lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
