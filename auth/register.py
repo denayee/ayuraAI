@@ -10,6 +10,8 @@ load_dotenv()
 
 @register_bp.route("/register", methods=["GET", "POST"])
 def register():
+    if "user_id" in session:
+        return redirect(url_for("recommendation.recommendation"))
     if request.method == "POST":
         name = request.form["name"]
         email = request.form["email"]

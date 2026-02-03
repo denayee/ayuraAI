@@ -10,6 +10,8 @@ load_dotenv()
 
 @login_bp.route("/login", methods=["GET", "POST"])
 def login():
+    if "user_id" in session:
+        return redirect(url_for("recommendation.recommendation"))
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
