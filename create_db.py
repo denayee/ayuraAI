@@ -1,6 +1,6 @@
-import sqlite3
+from database import get_db
 
-conn = sqlite3.connect("database.db")
+conn = get_db()
 cur = conn.cursor()
 
 # Create all tables

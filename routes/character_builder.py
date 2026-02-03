@@ -1,11 +1,10 @@
 from flask import Blueprint, request, session, redirect, render_template, url_for, flash
-import sqlite3
+from dotenv import load_dotenv
+from database import get_db
 
 character_bp = Blueprint("character_builder", __name__)
 
-
-def get_db():
-    return sqlite3.connect("database.db")
+load_dotenv()
 
 
 @character_bp.route("/character-builder", methods=["GET", "POST"])
@@ -90,21 +89,3 @@ def character_builder():
         return redirect(url_for("recommendation.recommendation"))
 
     return render_template("character_builder.html")
-
-
-# just try
-# jgpsjgpesjg
-# lsngisejg
-
-
-# flwhf# lsnfgslnfg# lsnglsnglsng
-# lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
-# lsnglsnglsng# lsnglsnglsng# lsnglsng
-# lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
-
-
-# hi third try
-# lsnglsnglsng# lsnglsnglsng# lsnglsnglsng
-# lsnglsnglsng# lsnglsnglsng# lsnglsng
-
-# lsnglsnglsng# lsnglsnglsng# lsnglsnglsng

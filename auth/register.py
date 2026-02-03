@@ -1,12 +1,11 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash, session
 import sqlite3
 from werkzeug.security import generate_password_hash
+from dotenv import load_dotenv
+from database import get_db
 
 register_bp = Blueprint("register", __name__)
-
-
-def get_db():
-    return sqlite3.connect("database.db")
+load_dotenv()
 
 
 @register_bp.route("/register", methods=["GET", "POST"])

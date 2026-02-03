@@ -1,11 +1,10 @@
 from flask import Blueprint, render_template, session, redirect, url_for
-import sqlite3
+from dotenv import load_dotenv
+from database import get_db
 
 recommendation_bp = Blueprint("recommendation", __name__)
 
-
-def get_db():
-    return sqlite3.connect("database.db")
+load_dotenv()
 
 
 @recommendation_bp.route("/ai-recommendation")
