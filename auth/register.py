@@ -7,6 +7,18 @@ from database import get_db
 register_bp = Blueprint("register", __name__)
 load_dotenv()
 
+# Ensure 'gender' column exists in 'users' table
+try:
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("ALTER TABLE users ADD COLUMN gender TEXT")
+    conn.commit()
+    conn.close()
+    print("Migration completed successfully: Added 'gender' column to 'users' table.")
+except Exception:
+    # Column likely already exists
+    pass
+
 
 @register_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -16,6 +28,7 @@ def register():
         name = request.form["name"]
         email = request.form["email"]
         age = request.form["age"]
+        gender = request.form["gender"]
         password = request.form["password"]
         repassword = request.form["repassword"]
 
@@ -29,8 +42,8 @@ def register():
         try:
             cur = db.cursor()
             cur.execute(
-                "INSERT INTO users (name, email, password, age) VALUES (?, ?, ?, ?)",
-                (name, email, hashed_password, age),
+                "INSERT INTO users (name, email, password, age, gender) VALUES (?, ?, ?, ?, ?)",
+                (name, email, hashed_password, age, gender),
             )
             user_id = cur.lastrowid
             db.commit()

@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    age INTEGER NOT NULL
+    age INTEGER NOT NULL,
+    gender TEXT
 );
 
 CREATE TABLE IF NOT EXISTS skin_profile (
@@ -21,6 +22,12 @@ CREATE TABLE IF NOT EXISTS skin_profile (
     skin_color TEXT,
     skin_problems TEXT,
     sensitivity_level TEXT,
+    oil_level TEXT,
+    acne_presence TEXT,
+    acne_level TEXT,
+    dryness_presence TEXT,
+    dryness_level TEXT,
+    lifestyle TEXT,
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
@@ -32,6 +39,11 @@ CREATE TABLE IF NOT EXISTS hair_profile (
     hair_color TEXT,
     hair_problems TEXT,
     scalp_condition TEXT,
+    hair_fall_level TEXT,
+    dryness_presence TEXT,
+    dryness_level TEXT,
+    scalp_itch_presence TEXT,
+    scalp_itch_level TEXT,
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
 

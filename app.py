@@ -8,7 +8,9 @@ import os
 
 app = Flask(__name__)
 load_dotenv()
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["SECRET_KEY"] = os.urandom(
+    24
+)  # Random key on every restart to invalidate sessions
 
 
 @app.after_request
