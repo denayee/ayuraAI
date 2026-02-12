@@ -3,10 +3,19 @@
 {% block home %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/ai_recomodation.css') }}">
 
-<div class="recommendation-container">
-    <h1>Welcome, {{ session.get('name', 'User') }}</h1>
-</div>
+    <div class="recommendation-wrapper">
+        <div class="recommendation-header">
+            <h1>Welcome, {{ session.get('name', 'User') }}</h1>
+        </div>
 
+        <div class="ai-output-card">
+            <h2 class="ai-output-title">✨ Gemini Recommendations</h2>
+            <div class="ai-output-content">
+{{ ai_output }}
+            </div>
+        </div>
+    </div>
+    
 {% if profile_incomplete %}
 <div class="popup-overlay">
     <div class="popup-box">
@@ -15,6 +24,7 @@
         <a href="{{ url_for('character_builder.character_builder') }}" class="btn-popup">Create Profile Now</a>
     </div>
 </div>
+
 {% endif %}
 
 {% endblock home %}
