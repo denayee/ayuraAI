@@ -1,7 +1,7 @@
 import os
 from google import genai
 from dotenv import load_dotenv
-from flask import render_template, Blueprint
+from flask import Blueprint
 
 load_dotenv()
 
