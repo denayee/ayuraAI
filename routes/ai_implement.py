@@ -7,7 +7,7 @@ load_dotenv()
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-ai_implement = Blueprint("implement", __name__)
+ai_implement = Blueprint("ai", __name__)
 
 
 def get_ai_recommendation():
@@ -21,9 +21,3 @@ def get_ai_recommendation():
     except Exception as e:
         print(f"Error generating AI content: {e}")
         return "Sorry, I couldn't generate a recommendation at this time."
-
-
-@ai_implement.route("/ai_implement")
-def implement():
-    output = get_ai_recommendation()
-    return render_template("ai_recomadation.html", ai_output=output)

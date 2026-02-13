@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for
 from dotenv import load_dotenv
 from database import get_db
-from ai_implement import get_ai_recommendation
+from routes.ai_implement import get_ai_recommendation
 
 recommendation_bp = Blueprint("recommendation", __name__)
 
@@ -35,6 +35,6 @@ def recommendation():
 
     return render_template(
         "ai_recomadation.html",
-        profile_incomplete=profile_incomplete,
+        profile_incomplete2=profile_incomplete,
         ai_output=ai_output,
     )
