@@ -1,4 +1,5 @@
 from flask import Blueprint, request, session, redirect, render_template, url_for, flash
+import os
 from dotenv import load_dotenv
 from database import get_db
 
@@ -149,6 +150,14 @@ def character_builder():
         db.close()
 
         session["profile_complete"] = True
+
+        # Cache Invalidation: Delete existing recommendation file if it exists
+        cache_file = os.path.join("recommendations", f"{user_id}.json")
+        if os.path.exists(cache_file):
+            try:
+                os.remove(cache_file)
+            except OSError as e:
+                print(f"Error removing cache file: {e}")
 
         flash("Profile created successfully!", "success")
         return redirect(url_for("recommendation.recommendation"))

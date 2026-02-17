@@ -9,11 +9,45 @@
         </div>
 
         <div class="ai-output-card">
-            <h2 class="ai-output-title">✨ Gemini Recommendations</h2>
-            <div class="ai-output-content">
-{{ ai_output }}
+            <div class="ai-header-row">
+                <h2 class="ai-output-title">✨ Gemini Recommendations</h2>
+                <div class="date-badge" id="current-date">Today</div>
             </div>
+            
+            <div class="loading-container" id="loading-spinner" style="display: none;">
+               <div class="spinner"></div>
+               <p>Analysing your profile...</p>
+            </div>
+
+            <div class="ai-output-content" id="ai-content">
+                <!-- Content will be rendered here by marked.js -->
+            </div>
+            
+            <!-- Hidden raw content -->
+            <div id="raw-content" style="display: none;">{{ ai_output }}</div>
         </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const rawContent = document.getElementById('raw-content').textContent;
+                const contentDiv = document.getElementById('ai-content');
+                const loadingSpinner = document.getElementById('loading-spinner');
+                
+                // Simple date
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('current-date').textContent = new Date().toLocaleDateString(undefined, options);
+
+                if (rawContent && rawContent.trim() !== 'None') {
+                    contentDiv.innerHTML = marked.parse(rawContent);
+                } else if ('{{ profile_incomplete2 }}' === 'False') {
+                    // Start loading effect if no content but profile is complete (meaning it's generating)
+                    // ... Wait, backend is synchronous so this state might not be reachable easily without async fetch
+                    // But nice to have structure.
+                    contentDiv.innerHTML = "<p>No recommendation available. Please complete your profile or try again.</p>";
+                }
+            });
+        </script>
     </div>
     
 {% if profile_incomplete2 %}
