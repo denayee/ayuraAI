@@ -1,0 +1,8 @@
+Flask
+google-genai
+google-api-core[grpc]
+google-auth
+requests
+beautifulsoup4
+python-dotenv
+gunicorn
