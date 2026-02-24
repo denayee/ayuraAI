@@ -45,6 +45,8 @@ def generate_recommendation(user_profile):
         3. Daily Care Routine
         4. Ingredients to Avoid
         5. Lifestyle Tips
+        6. Explanation of Recommendations
+        7. References (if any, provide links to studies or sources)
         """
 
         response = client.models.generate_content(
