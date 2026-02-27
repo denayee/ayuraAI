@@ -37,16 +37,20 @@ def generate_recommendation(user_profile):
         - Scalp Itch: {user_profile.get("scalp_itch_presence")} ({user_profile.get("scalp_itch_level")})
 
         - Allergies: {user_profile.get("allergies")}
+        - Age: {user_profile.get("age")}
 
         Provide response in Markdown format with these sections:
 
         1. Recommended Cosmetic Products
-        2. Safe Home Remedies
-        3. Daily Care Routine
-        4. Ingredients to Avoid
-        5. Lifestyle Tips
-        6. Explanation of Recommendations
-        7. References (if any, provide links to studies or sources)
+        2. Safe Home Remedies for Skin and Hair Care
+        3. Daily Care Routine for Skin and Hair
+        4. Ingredients to Avoid (if any)
+        5. Lifestyle Tips for Better Skin and Hair Health
+        6. Explanation of Recommendations (including how they address the user's specific profile)
+        7. References (if any, provide links to studies or sources) 
+        8. Disclaimer: Include a disclaimer that this is not medical advice and recommend consulting a healthcare professional for serious concerns.
+        9. Personalized Note: Add a friendly, personalized note at the end to encourage the user on their skincare and haircare journey.
+        10. Product Recommendations: For each recommended product, include a brief description, key ingredients, and why it's suitable for the user's profile.
         """
 
         response = client.models.generate_content(

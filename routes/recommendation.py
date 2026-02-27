@@ -31,7 +31,7 @@ def recommendation():
     ai_output = None
     if not profile_incomplete:
         # Define cache file path
-        cache_dir = "recommendations"
+        cache_dir = "AI_generated_json_file"
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
 
@@ -42,7 +42,7 @@ def recommendation():
             try:
                 with open(cache_file, "r") as f:
                     data = json.load(f)
-                    ai_output = data.get("recommendation")
+                    ai_output = data.get("AI_generated_json_file")
             except Exception as e:
                 print(f"Error reading cache file: {e}")
 
@@ -106,7 +106,9 @@ def recommendation():
                 # Save to Cache
                 try:
                     with open(cache_file, "w") as f:
-                        json.dump({"user_id": user_id, "recommendation": ai_output}, f)
+                        json.dump(
+                            {"user_id": user_id, "AI_generated_json_file": ai_output}, f
+                        )
                 except Exception as e:
                     print(f"Error saving cache file: {e}")
 

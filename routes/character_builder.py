@@ -152,7 +152,7 @@ def character_builder():
         session["profile_complete"] = True
 
         # Cache Invalidation: Delete existing recommendation file if it exists
-        cache_file = os.path.join("recommendations", f"{user_id}.json")
+        cache_file = os.path.join("AI_generated_json_file", f"{user_id}.json")
         if os.path.exists(cache_file):
             try:
                 os.remove(cache_file)
