@@ -3,65 +3,279 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-text">
-            <h2>AI-Powered Beauty & Home Remedy Recommendations</h2>
+        <!-- Premium Live Image Slider -->
+        <div class="banner-container">
+            <div class="banner-slide active" style="background-image: url('https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&q=80&w=2000');">
+                <div class="banner-overlay"></div>
+            </div>
+            <div class="banner-slide" style="background-image: url('https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=2000');">
+                <div class="banner-overlay"></div>
+            </div>
+            <div class="banner-slide" style="background-image: url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=2000');">
+                <div class="banner-overlay"></div>
+            </div>
+        </div>
+
+        <!-- Left Aligned Hero Box -->
+        <div class="hero-content">
+            <h2>Personalized <span>Skin & Hair</span> Care Analysis</h2>
             <p>
-                Get personalized cosmetic product and natural home remedy
-                recommendations based on your skin type, hair condition, and allergies.
+                Get expert-level cosmetic product and natural home remedy
+                recommendations based on your unique physiological profile and allergy requirements.
             </p>
-            <a href="{{ url_for('register.register') }}" class="btn-primary">Start Free Analysis</a>
+            <a href="{{ url_for('register.register') }}" class="btn-primary">Start Free Consultation</a>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <h2>Key Features</h2>
-        <div class="feature-grid">
-
-            <div class="feature-card">
-                <h3>🧠 AI Personalization</h3>
-                <p>Smart analysis of skin and hair type using machine learning.</p>
+    <!-- Why Choose Us / Features Section -->
+    <section id="features" class="section section-alt">
+        <div class="section-header">
+            <h2>Why Makes AyuraAI Different?</h2>
+            <p>Clinically-inspired AI algorithms designed to protect and enhance your wellbeing.</p>
+        </div>
+        
+        <div class="stacked-cards-container">
+            <!-- Stacked Card 1 -->
+            <div class="stacked-card" style="--z-index: 10;">
+                <div class="icon">🔬</div>
+                <div class="stacked-content">
+                    <h3>Advanced Diagnostics</h3>
+                    <p>Our intelligent engine analyzes your skin type, hair condition, and explicit data inputs to generate highly tailored clinical routines, ensuring every recommendation is physically suited for you.</p>
+                </div>
             </div>
 
-            <div class="feature-card">
-                <h3>🛡️ Allergy Safety</h3>
-                <p>Avoids harmful ingredients and suggests safe alternatives.</p>
+            <!-- Stacked Card 2 -->
+            <div class="stacked-card" style="--z-index: 20;">
+                <div class="icon">🛡️</div>
+                <div class="stacked-content">
+                    <h3>Allergy Match</h3>
+                    <p>The system actively cross-references your listed allergies against thousands of known cosmetic ingredients.</p>
+                </div>
             </div>
 
-            <div class="feature-card">
-                <h3>💄 Cosmetic Products</h3>
-                <p>Recommends dermatologist-safe and suitable beauty products.</p>
+            <!-- Stacked Card 3 -->
+            <div class="stacked-card" style="--z-index: 30;">
+                <div class="icon">🧴</div>
+                <div class="stacked-content">
+                    <h3>Dermatologist Trusted</h3>
+                    <p>We connect you with verified, non-toxic, highly-rated wellness items.</p>
+                </div>
             </div>
 
-            <div class="feature-card">
-                <h3>🌿 Home Remedies</h3>
-                <p>Natural, chemical-free remedies using common ingredients.</p>
+            <!-- Stacked Card 4 -->
+            <div class="stacked-card" style="--z-index: 40;">
+                <div class="icon">🌿</div>
+                <div class="stacked-content">
+                    <h3>Natural Remedies & Care</h3>
+                    <p>Access organic skincare alternatives. We generate chemical-free, natural home remedies customized for your specific concerns, ensuring safe, holistic wellbeing right at home.</p>
+                </div>
+            </div>
+            
+            <!-- Stacked Card 5 -->
+            <div class="stacked-card" style="--z-index: 50;">
+                <div class="icon">⚡</div>
+                <div class="stacked-content">
+                    <h3>Instant Results</h3>
+                    <p>Milisec-level processing for immediate clinical routine generation.</p>
+                </div>
             </div>
 
-            <div class="feature-card">
-                <h3>📋 Usage Guide</h3>
-                <p>Step-by-step instructions for application and preparation.</p>
+            <!-- Stacked Card 6 -->
+            <div class="stacked-card" style="--z-index: 60;">
+                <div class="icon">🔒</div>
+                <div class="stacked-content">
+                    <h3>Secure Profile</h3>
+                    <p>Your physiological data and allergy requirements are securely stored and completely private.</p>
+                </div>
             </div>
-
-            <div class="feature-card">
-                <h3>⚡ Fast & Simple</h3>
-                <p>Easy forms, quick results, and clean user experience.</p>
-            </div>
-
         </div>
     </section>
 
-    <!-- How It Works -->
-    <section id="how" class="how-it-works">
-        <h2>How It Works</h2>
-        <ol>
-            <li>User enters skin, hair, and allergy details</li>
-            <li>AI analyzes the input</li>
-            <li>System filters unsafe ingredients</li>
-            <li>Personalized recommendations are generated</li>
-        </ol>
+    <!-- How It Works Section -->
+    <section id="how" class="section">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>Three simple steps to your personalized care plan.</p>
+        </div>
+        
+        <div class="how-grid">
+            <div class="how-card delay-100">
+                <div class="how-icon">1</div>
+                <h3>Build Your Smart Profile</h3>
+                <p>Create your AI-powered digital avatar by uploading your photo and preferences.</p>
+            </div>
+            <div class="how-card delay-200">
+                <div class="how-icon">2</div>
+                <h3>Intelligent Skin & Hair Analysis</h3>
+                <p>Our advanced AI analyzes texture, tone, and concerns to understand your unique needs.</p>
+            </div>
+            <div class="how-card delay-300">
+                <div class="how-icon">3</div>
+                <h3>Personalized Care Recommendations</h3>
+                <p>Get data-driven skincare and haircare solutions curated just for you.</p>
+            </div>
+        </div>
     </section>
 
-   
-    
+    <!-- LIVE STATISTICS SECTION -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-card reveal-up">
+                <h2 class="stat-number" data-target="5000">0</h2>
+                <span class="stat-plus">+</span>
+                <p class="stat-label">Users</p>
+            </div>
+            <div class="stat-card reveal-up delay-100">
+                <h2 class="stat-number" data-target="12000">0</h2>
+                <span class="stat-plus">+</span>
+                <p class="stat-label">Profiles Analyzed</p>
+            </div>
+            <div class="stat-card reveal-up delay-200">
+                <h2 class="stat-number" data-target="95">0</h2>
+                <span class="stat-plus">%</span>
+                <p class="stat-label">Accuracy</p>
+            </div>
+            <div class="stat-card reveal-up delay-300">
+                <h2 class="stat-number" data-target="24">0</h2>
+                <span class="stat-plus">/7</span>
+                <p class="stat-label">Smart Support</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section">
+        <div class="contact-container">
+            <h2 class="contact-heading">Get in Touch</h2>
+            <p class="contact-subtitle">We'd love to hear from you. Send us a message and we'll reply shortly.</p>
+            
+            <form action="#" method="POST" class="contact-form">
+                <div class="form-group">
+                    <label for="contact-name">Full Name</label>
+                    <input type="text" id="contact-name" name="name" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="contact-email">Email Address</label>
+                    <input type="email" id="contact-email" name="email" placeholder="john@example.com" required>
+                </div>
+                <div class="form-group full">
+                    <label for="contact-message">Message</label>
+                    <textarea id="contact-message" name="message" rows="5" placeholder="How can we help you?" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary contact-submit">Send Message ✨</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- UI Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Live Image Slider
+            const slides = document.querySelectorAll('.banner-slide');
+            let currentSlide = 0;
+            if (slides.length > 0) {
+                // Crossfade every 4 seconds for a more relaxed, premium feel
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, 4000); 
+            }
+
+            // Stacked Cards Advanced Scroll Animation
+            const cards = document.querySelectorAll('.stacked-card');
+            const stickyTop = window.innerHeight * 0.15; // Target threshold roughly matching 15vh in CSS
+
+            // 1. Initial Reveal via Intersection Observer
+            const observerElements = document.querySelectorAll('.stacked-card, .how-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            observerElements.forEach(el => observer.observe(el));
+
+            // Continuous Scroll Effect for "Fading Behind" Stack Panels
+            window.addEventListener('scroll', () => {
+                cards.forEach((card, index) => {
+                    if (!card.classList.contains('is-visible')) return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    
+                    // Trigger scroll effect when card is roughly at its sticky anchor
+                    if (rect.top <= stickyTop + 10) { 
+                        if (index < cards.length - 1) {
+                            const nextCard = cards[index + 1];
+                            const nextRect = nextCard.getBoundingClientRect();
+                            const distanceToNext = nextRect.top - stickyTop;
+                            const fadeStartDistance = window.innerHeight * 0.55; 
+                            
+                            if (distanceToNext < fadeStartDistance && distanceToNext > 0) {
+                                // Next card is sliding over this one, apply the backward fade/shrink
+                                const progress = 1 - (distanceToNext / fadeStartDistance); 
+                                const scale = 1 - (progress * 0.05); // slightly shrink
+                                const yOffset = -(progress * 40); // slightly upward motion
+                                
+                                card.style.transform = `scale(${scale}) translateY(${yOffset}px)`;
+                                card.style.opacity = 1 - (progress * 0.6); 
+                            } else if (distanceToNext <= 0) {
+                                // Next card completely covered it
+                                card.style.transform = `scale(0.95) translateY(-40px)`;
+                                card.style.opacity = 0.4;
+                            } else {
+                                // Next card is still far away
+                                card.style.transform = '';
+                                card.style.opacity = '';
+                            }
+                        }
+                    } else {
+                        // Card is below the sticky anchor
+                        card.style.transform = '';
+                        card.style.opacity = '';
+                    }
+                });
+            });
+
+            // Live Number Counting Animation
+            const statNumbers = document.querySelectorAll('.stat-number');
+            let hasCounted = false;
+
+            const countObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasCounted) {
+                        hasCounted = true; // Only count once per page load
+                        
+                        statNumbers.forEach(stat => {
+                            const target = +stat.getAttribute('data-target');
+                            const increment = target / 60; // Spread over approx 60 frames (1 second)
+                            let current = 0;
+
+                            const updateCount = () => {
+                                current += increment;
+                                if (current < target) {
+                                    stat.innerText = Math.ceil(current).toLocaleString();
+                                    requestAnimationFrame(updateCount);
+                                } else {
+                                    stat.innerText = target.toLocaleString();
+                                }
+                            };
+                            updateCount();
+                        });
+                    }
+                });
+            }, { threshold: 0.5 }); // Trigger when section is halfway visible
+
+            const statsSection = document.querySelector('.stats-section');
+            if (statsSection) {
+                countObserver.observe(statsSection);
+                // Also add reveal-up elements to the main observer so they fade in
+                document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
+            }
+
+        });
+    </script>
+
 {% endblock home %}

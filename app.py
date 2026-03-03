@@ -21,7 +21,6 @@ def add_header(response):
     response.headers["Expires"] = "0"
     return response
 
-
 @app.route("/")
 def home():
     if "user_id" in session:

@@ -31,8 +31,25 @@
                 <a href="{{ url_for('login.login') }}">Login</a>
                 <a href="{{ url_for('register.register') }}" class="btn">Get Started</a>
             {% endif %}
+            <div class="theme-toggle-container">
+                <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
         </nav>
     </header>
+
+    <!-- Flash Messages Container -->
+    <div class="flash-toast-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
 <!-- now this is extend body to another page -->
 {% block home %}
     
@@ -48,5 +65,40 @@
         <p>© 2026 AyuraAI | AI-Based Cosmetic & Home Remedy System</p>
     </footer>
 
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme');
+        
+        if (currentTheme) {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            if (currentTheme === 'dark') {
+                themeToggle.textContent = '☀️';
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                themeToggle.textContent = '🌙';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.textContent = '☀️';
+            }
+        });
+
+        // Cute Greeting Popup auto-remove logic
+        const flashMessages = document.querySelectorAll('.flash-message');
+        if (flashMessages.length > 0) {
+            flashMessages.forEach(msg => {
+                setTimeout(() => {
+                    msg.classList.add('fade-out');
+                    setTimeout(() => msg.remove(), 400); // Shorter fade wait
+                }, 1500); // Display for exactly 1.5 seconds
+            });
+        }
+    </script>
 </body>
 </html>
