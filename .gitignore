@@ -88,4 +88,3 @@ target/
 
 # Virtual environment
 .venv/
-*.db
