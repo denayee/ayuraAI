@@ -129,8 +129,8 @@ a:hover {
 
 /* Navbar */
 .navbar {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     padding: 15px 5vw;
     background-color: var(--surface-color);
@@ -146,12 +146,21 @@ a:hover {
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.02em;
+    justify-self: start;
 }
 
 .navbar nav {
     display: flex;
     align-items: center;
     gap: 30px;
+    justify-self: center;
+}
+
+.navbar .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-self: end;
 }
 
 .navbar nav a:not(.btn) {
@@ -317,7 +326,7 @@ a:hover {
     max-width: 600px;
     box-shadow: var(--card-shadow);
     /* Subtle border */
-    border: 1px solid var(--border-color);
+    border: 2px solid darkslateblue;
     animation: fadeInUp 0.8s ease-out;
 }
 
@@ -400,83 +409,60 @@ a:hover {
     color: var(--text-secondary);
 }
 
-/* --- Stacked Scrolling Feature Cards --- */
+/* --- Feature Cards Grid --- */
 .stacked-cards-container {
-    padding: 0 5vw 15vh;
-    /* Bottom padding to scroll past the last card */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 1000px;
+    padding: 0 5vw 10vh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    max-width: 1200px;
     margin: 0 auto;
     position: relative;
 }
 
 .stacked-card {
-    position: sticky;
-    top: 15vh;
-    /* Stops scrolling exactly 15vh from the top */
-    width: 100%;
-
     /* Layout */
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 40px;
-    padding: 50px 60px;
-    margin-bottom: 60vh;
-    /* Huge margin guarantees user must scroll down to reveal the next card */
+    gap: 20px;
+    padding: 40px;
 
     /* Premium Styling */
     background: #ffffff;
     border: 1px solid rgba(226, 232, 240, 0.8);
     border-radius: 20px;
-    /* 20px+ rounded corners */
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05), 0 10px 30px rgba(0, 0, 0, 0.03);
-    /* Soft shadow for layered depth */
-
-    /* Animations */
-    transform-origin: center top;
-    will-change: transform, opacity;
-    z-index: var(--z-index);
-    /* assigned in HTML */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
 
     /* Reveal Animation State */
     opacity: 0;
-    transform: translateY(100px);
-    transition: opacity 0.7s ease-in-out, box-shadow 0.3s ease;
-    /* Note: transform transition is handled carefully to not lag JS scroll */
+    transform: translateY(50px);
+    transition: opacity 0.7s ease-in-out, transform 0.7s ease, box-shadow 0.3s ease;
 }
-
-/* Ensure last card doesn't force a huge scroll empty area at the bottom */
-.stacked-card:last-child {
-    margin-bottom: 15vh;
-}
-
-.stacked-card:nth-child(1) { --z-index: 10; }
-.stacked-card:nth-child(2) { --z-index: 20; }
-.stacked-card:nth-child(3) { --z-index: 30; }
-.stacked-card:nth-child(4) { --z-index: 40; }
-.stacked-card:nth-child(5) { --z-index: 50; }
-.stacked-card:nth-child(6) { --z-index: 60; }
 
 /* When intersection observer hits initially */
 .stacked-card.is-visible {
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border: 2px solid darkslateblue;
+}
+
+.stacked-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
 }
 
 [data-theme="dark"] .stacked-card {
     background: linear-gradient(135deg, rgba(30, 41, 59, 1), rgba(15, 23, 42, 1));
     border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 2px solid darkslateblue;
 }
 
 .stacked-card .icon {
     font-size: 3rem;
-    min-width: 90px;
-    height: 90px;
+    min-width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -496,7 +482,7 @@ a:hover {
 }
 
 .stacked-content h3 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 15px;
     color: var(--text-primary);
@@ -504,20 +490,24 @@ a:hover {
 }
 
 .stacked-content p {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     color: var(--text-secondary);
     line-height: 1.6;
 }
 
+@media (max-width: 992px) {
+    .stacked-cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
+    .stacked-cards-container {
+        grid-template-columns: 1fr;
+    }
+
     .stacked-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 24px;
-        padding: 40px 30px;
-        top: 10vh;
-        /* Less sticky gap on small screens */
-        margin-bottom: 50vh;
+        padding: 30px;
     }
 
     .stacked-card .icon {
@@ -528,11 +518,11 @@ a:hover {
     }
 
     .stacked-content h3 {
-        font-size: 1.45rem;
+        font-size: 1.35rem;
     }
 
     .stacked-content p {
-        font-size: 1.05rem;
+        font-size: 1rem;
     }
 }
 
@@ -579,14 +569,17 @@ a:hover {
 /* Staggered Delay */
 .how-card.delay-100 {
     transition-delay: 0.1s;
+    border: 2px solid darkslateblue;
 }
 
 .how-card.delay-200 {
     transition-delay: 0.2s;
+    border: 2px solid darkslateblue;
 }
 
 .how-card.delay-300 {
     transition-delay: 0.3s;
+    border: 2px solid darkslateblue;
 }
 
 .how-icon {
@@ -699,6 +692,7 @@ a:hover {
 .reveal-up.is-visible {
     opacity: 1;
     transform: translateY(0);
+    border: 2px solid darkslateblue;
 }
 
 @media (max-width: 900px) {
@@ -725,7 +719,11 @@ a:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 20px;
+    border: 2px solid darkslateblue;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    background: var(--surface-color);
+    padding: 50px 20px;
 }
 
 .contact-heading {
@@ -792,7 +790,7 @@ a:hover {
 
 [data-theme="dark"] .contact-form input,
 [data-theme="dark"] .contact-form textarea {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.03);
 }
 
 .contact-form input:focus,
@@ -847,7 +845,7 @@ a:hover {
 
 .auth-card {
     background: var(--surface-color);
-    border: 1px solid var(--border-color);
+    border: 2px solid darkslateblue;
     padding: 50px;
     width: 100%;
     max-width: 460px;
@@ -948,7 +946,7 @@ a:hover {
 
 /* Footer */
 .footer {
-    color: var(--text-muted);
+    color: var(--primary-color);
     text-align: center;
     padding: 30px 20px;
     background: var(--surface-color);

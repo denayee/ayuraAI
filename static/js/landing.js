@@ -32,41 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     observerElements.forEach(el => observer.observe(el));
 
-    // Continuous Scroll Effect for "Fading Behind" Stack Panels
-    window.addEventListener('scroll', () => {
-        cards.forEach((card, index) => {
-            if (!card.classList.contains('is-visible')) return;
-            
-            const rect = card.getBoundingClientRect();
-            
-            if (rect.top <= stickyTop + 10) { 
-                if (index < cards.length - 1) {
-                    const nextCard = cards[index + 1];
-                    const nextRect = nextCard.getBoundingClientRect();
-                    const distanceToNext = nextRect.top - stickyTop;
-                    const fadeStartDistance = window.innerHeight * 0.55; 
-                    
-                    if (distanceToNext < fadeStartDistance && distanceToNext > 0) {
-                        const progress = 1 - (distanceToNext / fadeStartDistance); 
-                        const scale = 1 - (progress * 0.05);
-                        const yOffset = -(progress * 40);
-                        
-                        card.style.transform = `scale(${scale}) translateY(${yOffset}px)`;
-                        card.style.opacity = 1 - (progress * 0.6); 
-                    } else if (distanceToNext <= 0) {
-                        card.style.transform = `scale(0.95) translateY(-40px)`;
-                        card.style.opacity = 0.4;
-                    } else {
-                        card.style.transform = '';
-                        card.style.opacity = '';
-                    }
-                }
-            } else {
-                card.style.transform = '';
-                card.style.opacity = '';
-            }
-        });
-    });
+    // Stacked card continuous scroll effect was removed as cards are now in a grid layout.
 
     // Live Number Counting Animation
     const statNumbers = document.querySelectorAll('.stat-number');
