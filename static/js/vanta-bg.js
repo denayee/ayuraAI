@@ -6,6 +6,11 @@ function setVanta() {
       window.vantaEffect.destroy()
       window.vantaEffect = null
     }
+    
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const bgColor = isDark ? 0x0f172a : 0xffffff; // slate 900 for dark mode, white for light
+    const primaryColor = isDark ? 0x14b8a6 : 0x0d9488; // primary color
+    
     window.vantaEffect = VANTA.GLOBE({
       el: "#vanta-poster",
       mouseControls: true,
@@ -15,9 +20,9 @@ function setVanta() {
       minWidth: 200.00,
       scale: 1.00,
       scaleMobile: 1.00,
-      color: 0x3fff82,
-      color2: 0x0,
-      backgroundColor: 0xffffff
+      color: primaryColor,
+      color2: isDark ? 0xffffff : 0x000000,
+      backgroundColor: bgColor
     })
   } catch (e) {
     console.warn('Vanta init failed', e)
@@ -29,6 +34,17 @@ if (document.readyState === 'loading') {
 } else {
   setVanta()
 }
+
+// Watch for theme changes so the background updates dynamically
+const themeObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+            setVanta();
+        }
+    });
+});
+
+themeObserver.observe(document.documentElement, { attributes: true });
 
 if (window._strk && typeof _strk.push === 'function') {
   _strk.push(function() {

@@ -18,7 +18,9 @@
             <a href="#features">Features</a>
             <a href="#how">How It Works</a>
             <a href="#contact">Contact</a>
+        </nav>
 
+        <div class="nav-actions">
             {% if 'user_id' in session %}
                 <div class="user-menu">
                     <div class="user-avatar" id="avatar-btn">
@@ -38,7 +40,7 @@
             <div class="theme-toggle-container">
                 <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
             </div>
-        </nav>
+        </div>
 
         <!-- Hamburger Button (mobile only) -->
         <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
