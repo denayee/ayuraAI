@@ -5,13 +5,13 @@
     <section class="hero">
         <!-- Premium Live Image Slider -->
         <div class="banner-container">
-            <div class="banner-slide active" style="background-image: url('https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&q=80&w=2000');">
+            <div class="banner-slide active bg-slide-1">
                 <div class="banner-overlay"></div>
             </div>
-            <div class="banner-slide" style="background-image: url('https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=2000');">
+            <div class="banner-slide bg-slide-2">
                 <div class="banner-overlay"></div>
             </div>
-            <div class="banner-slide" style="background-image: url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=2000');">
+            <div class="banner-slide bg-slide-3">
                 <div class="banner-overlay"></div>
             </div>
         </div>
@@ -36,7 +36,7 @@
         
         <div class="stacked-cards-container">
             <!-- Stacked Card 1 -->
-            <div class="stacked-card" style="--z-index: 10;">
+            <div class="stacked-card">
                 <div class="icon">🔬</div>
                 <div class="stacked-content">
                     <h3>Advanced Diagnostics</h3>
@@ -45,7 +45,7 @@
             </div>
 
             <!-- Stacked Card 2 -->
-            <div class="stacked-card" style="--z-index: 20;">
+            <div class="stacked-card">
                 <div class="icon">🛡️</div>
                 <div class="stacked-content">
                     <h3>Allergy Match</h3>
@@ -54,7 +54,7 @@
             </div>
 
             <!-- Stacked Card 3 -->
-            <div class="stacked-card" style="--z-index: 30;">
+            <div class="stacked-card">
                 <div class="icon">🧴</div>
                 <div class="stacked-content">
                     <h3>Dermatologist Trusted</h3>
@@ -63,7 +63,7 @@
             </div>
 
             <!-- Stacked Card 4 -->
-            <div class="stacked-card" style="--z-index: 40;">
+            <div class="stacked-card">
                 <div class="icon">🌿</div>
                 <div class="stacked-content">
                     <h3>Natural Remedies & Care</h3>
@@ -72,7 +72,7 @@
             </div>
             
             <!-- Stacked Card 5 -->
-            <div class="stacked-card" style="--z-index: 50;">
+            <div class="stacked-card">
                 <div class="icon">⚡</div>
                 <div class="stacked-content">
                     <h3>Instant Results</h3>
@@ -81,7 +81,7 @@
             </div>
 
             <!-- Stacked Card 6 -->
-            <div class="stacked-card" style="--z-index: 60;">
+            <div class="stacked-card">
                 <div class="icon">🔒</div>
                 <div class="stacked-content">
                     <h3>Secure Profile</h3>
@@ -168,114 +168,7 @@
     </section>
 
     <!-- UI Scripts -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Live Image Slider
-            const slides = document.querySelectorAll('.banner-slide');
-            let currentSlide = 0;
-            if (slides.length > 0) {
-                // Crossfade every 4 seconds for a more relaxed, premium feel
-                setInterval(() => {
-                    slides[currentSlide].classList.remove('active');
-                    currentSlide = (currentSlide + 1) % slides.length;
-                    slides[currentSlide].classList.add('active');
-                }, 4000); 
-            }
+    <script src="{{ url_for('static', filename='js/landing.js') }}" defer></script>
 
-            // Stacked Cards Advanced Scroll Animation
-            const cards = document.querySelectorAll('.stacked-card');
-            const stickyTop = window.innerHeight * 0.15; // Target threshold roughly matching 15vh in CSS
-
-            // 1. Initial Reveal via Intersection Observer
-            const observerElements = document.querySelectorAll('.stacked-card, .how-card');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            observerElements.forEach(el => observer.observe(el));
-
-            // Continuous Scroll Effect for "Fading Behind" Stack Panels
-            window.addEventListener('scroll', () => {
-                cards.forEach((card, index) => {
-                    if (!card.classList.contains('is-visible')) return;
-                    
-                    const rect = card.getBoundingClientRect();
-                    
-                    // Trigger scroll effect when card is roughly at its sticky anchor
-                    if (rect.top <= stickyTop + 10) { 
-                        if (index < cards.length - 1) {
-                            const nextCard = cards[index + 1];
-                            const nextRect = nextCard.getBoundingClientRect();
-                            const distanceToNext = nextRect.top - stickyTop;
-                            const fadeStartDistance = window.innerHeight * 0.55; 
-                            
-                            if (distanceToNext < fadeStartDistance && distanceToNext > 0) {
-                                // Next card is sliding over this one, apply the backward fade/shrink
-                                const progress = 1 - (distanceToNext / fadeStartDistance); 
-                                const scale = 1 - (progress * 0.05); // slightly shrink
-                                const yOffset = -(progress * 40); // slightly upward motion
-                                
-                                card.style.transform = `scale(${scale}) translateY(${yOffset}px)`;
-                                card.style.opacity = 1 - (progress * 0.6); 
-                            } else if (distanceToNext <= 0) {
-                                // Next card completely covered it
-                                card.style.transform = `scale(0.95) translateY(-40px)`;
-                                card.style.opacity = 0.4;
-                            } else {
-                                // Next card is still far away
-                                card.style.transform = '';
-                                card.style.opacity = '';
-                            }
-                        }
-                    } else {
-                        // Card is below the sticky anchor
-                        card.style.transform = '';
-                        card.style.opacity = '';
-                    }
-                });
-            });
-
-            // Live Number Counting Animation
-            const statNumbers = document.querySelectorAll('.stat-number');
-            let hasCounted = false;
-
-            const countObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && !hasCounted) {
-                        hasCounted = true; // Only count once per page load
-                        
-                        statNumbers.forEach(stat => {
-                            const target = +stat.getAttribute('data-target');
-                            const increment = target / 60; // Spread over approx 60 frames (1 second)
-                            let current = 0;
-
-                            const updateCount = () => {
-                                current += increment;
-                                if (current < target) {
-                                    stat.innerText = Math.ceil(current).toLocaleString();
-                                    requestAnimationFrame(updateCount);
-                                } else {
-                                    stat.innerText = target.toLocaleString();
-                                }
-                            };
-                            updateCount();
-                        });
-                    }
-                });
-            }, { threshold: 0.5 }); // Trigger when section is halfway visible
-
-            const statsSection = document.querySelector('.stats-section');
-            if (statsSection) {
-                countObserver.observe(statsSection);
-                // Also add reveal-up elements to the main observer so they fade in
-                document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
-            }
-
-        });
-    </script>
 
 {% endblock home %}

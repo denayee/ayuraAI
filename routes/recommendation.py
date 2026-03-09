@@ -20,10 +20,11 @@ def recommendation():
     db = get_db()
     cur = db.cursor()
 
-    # Get User Age
-    cur.execute("SELECT age FROM users WHERE id = ?", (user_id,))
-    user_age_row = cur.fetchone()
-    user_age = user_age_row[0] if user_age_row else 25
+    # Get User Age and Gender
+    cur.execute("SELECT age, gender FROM users WHERE id = ?", (user_id,))
+    user_row = cur.fetchone()
+    user_age = user_row[0] if user_row else 25
+    user_gender = user_row[1] if user_row else "Not specified"
 
     # Check if profile exists
     cur.execute("SELECT COUNT(*) FROM skin_profile WHERE user_id = ?", (user_id,))
@@ -48,8 +49,8 @@ def recommendation():
     )
     hair_row = cur.fetchone()
 
-    # Fetch Allergies
-    cur.execute("SELECT ingredient FROM allergies WHERE user_id = ?", (user_id,))
+    # Fetch Allergies (DISTINCT to avoid duplicates on re-submission)
+    cur.execute("SELECT DISTINCT ingredient FROM allergies WHERE user_id = ?", (user_id,))
     allergies = [row[0] for row in cur.fetchall()]
 
     user_profile = None
@@ -75,6 +76,8 @@ def recommendation():
             "scalp_itch_presence": hair_row[10],
             "scalp_itch_level": hair_row[11],
             "allergies": ", ".join(allergies) if allergies else "None",
+            "age": user_age,
+            "gender": user_gender,
         }
 
     ai_output = None
@@ -121,4 +124,5 @@ def recommendation():
         profile_incomplete2=profile_incomplete,
         ai_output=ai_output,
         ml_data=ml_predictions if not profile_incomplete else None,
+        user_profile=user_profile,
     )

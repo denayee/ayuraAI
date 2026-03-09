@@ -38,6 +38,7 @@ def generate_recommendation(user_profile):
 
         - Allergies: {user_profile.get("allergies")}
         - Age: {user_profile.get("age")}
+        - Gender: {user_profile.get("gender")}
 
         Provide response in Markdown format with these sections:
 

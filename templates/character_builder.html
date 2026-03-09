@@ -255,12 +255,13 @@
              <div class="form-group">
                 <label>Primary Environment</label>
                  <div class="radio-group-inline">
-                    <label><input type="radio" name="lifestyle" value="Indoor"> Indoor</label>
-                    <label><input type="radio" name="lifestyle" value="Outdoor"> Outdoor</label>
+                    <label><input type="radio" name="lifestyle" value="Indoor" onchange="toggleField('environment-group', true)"> Indoor</label>
+                    <label><input type="radio" name="lifestyle" value="Outdoor" onchange="toggleField('environment-group', false)" checked> Outdoor</label>
                 </div>
             </div>
 
             <div class="step-buttons">
+                <button type="button" class="btn-back" onclick="showStep(1)">⬅ Back</button>
                 <button type="button" class="btn-next" onclick="nextStep(3)">Next ➔</button>
             </div>
             </div> <!-- End Step 2 -->
@@ -270,345 +271,12 @@
 
             <!-- Script for Dynamic Logic -->
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Initial check
-                    handleSkinType();
-                    handleScalpCondition();
-                });
-
-                function toggleField(elementId, show) {
-                    const el = document.getElementById(elementId);
-                    if (!el) return;
-                    
-                    if (show) {
-                        el.classList.remove('hidden');
-                        const input = el.querySelector('input');
-                        if (input) input.setAttribute('required', 'required'); 
-                    } else {
-                        el.classList.add('hidden');
-                        const input = el.querySelector('input');
-                        if (input) {
-                            input.removeAttribute('required');
-                            input.value = ''; // Clean up
-                        }
-                    }
-                }
-
-                function handleSkinType() {
-                    const skinType = document.querySelector('select[name="skin_type"]').value;
-                    const oilGroup = document.getElementById('skin-oil-group');
-                    const drynessGroup = document.getElementById('dryness-group'); // Container for presence+level
-                    const drynessPresenceYes = document.querySelector('input[name="dryness_presence"][value="Yes"]');
-                    const drynessPresenceNo = document.querySelector('input[name="dryness_presence"][value="No"]');
-                    
-                    // Logic: Oily -> Show Oil Level
-                    if (skinType === 'Oily') {
-                        if(oilGroup) toggleField('skin-oil-group', true);
-                    } else {
-                        if(oilGroup) toggleField('skin-oil-group', false);
-                    }
-
-                    // Logic: Dry -> Show Dryness Level (Auto-select Yes)
-                    if (skinType === 'Dry') {
-                         // Auto-set presence to Yes and show level
-                         if(drynessPresenceYes) drynessPresenceYes.click();
-                         // Optional: Hide the presence toggle purely if we want to force it, 
-                         // but keeping it visible as a confirmation is safer for now, 
-                         // or we can hide the wrapper 'skin-dryness-presence-wrapper' if requested.
-                         // User said "show skin dry level".
-                    } else {
-                        // If switching away from Dry, should we auto-reset? 
-                        // Maybe safer to default to No if it was auto-set? 
-                        // For UX, if user selected Dry then changed mind, we reset.
-                        if(drynessPresenceNo && skinType !== '') drynessPresenceNo.click();
-                    }
-                }
-
-                function handleScalpCondition() {
-                    const condition = document.querySelector('select[name="scalp_condition"]').value;
-                    const hairDrynessPresenceYes = document.querySelector('input[name="hair_dryness_presence"][value="Yes"]');
-                    const hairDrynessPresenceNo = document.querySelector('input[name="hair_dryness_presence"][value="No"]');
-
-                    // If Scalp is Dry -> Auto-trigger Hair Dryness logic
-                    if (condition === 'Dry') {
-                        if(hairDrynessPresenceYes) hairDrynessPresenceYes.click();
-                    } else {
-                         if(hairDrynessPresenceNo && condition !== '') hairDrynessPresenceNo.click();
-                    }
-                }
-
-                // --- 3-Step Navigation Logic ---
-                let currentStep = 1;
-                const totalSteps = 3;
-
-                function updateProgress() {
-                    document.getElementById('step-text').innerText = `Step ${currentStep} of ${totalSteps}`;
-                    const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
-                    document.getElementById('progress-fill').style.width = `${progressPercent}%`;
-                }
-
-                function showStep(step) {
-                    // Hide all
-                    document.querySelectorAll('.form-step').forEach(el => {
-                        el.classList.remove('active');
-                        el.style.display = 'none';
-                    });
-                    
-                    // Show target
-                    const target = document.getElementById(`step-${step}`);
-                    target.style.display = 'block';
-                    // Trigger reflow for animation
-                    void target.offsetWidth;
-                    target.classList.add('active');
-                    
-                    currentStep = step;
-                    updateProgress();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-
-                function nextStep(step) {
-                    // Very basic validation - check if required fields in current step are filled
-                    const currentContainer = document.getElementById(`step-${currentStep}`);
-                    const requiredInputs = currentContainer.querySelectorAll('input[required], select[required]');
-                    let allValid = true;
-                    
-                    requiredInputs.forEach(input => {
-                        if (!input.value || (input.type === 'radio' && !currentContainer.querySelector(`input[name="${input.name}"]:checked`))) {
-                            allValid = false;
-                            input.reportValidity(); // Show native browser warning
-                        }
-                    });
-
-                    if (allValid) {
-                        showStep(step);
-                    }
-                }
-
-                // Add selected highlight to dropdowns
-                document.querySelectorAll('select').forEach(sel => {
-                    sel.addEventListener('change', function() {
-                        if(this.value && this.value !== "") {
-                            this.classList.add('has-val');
-                        } else {
-                            this.classList.remove('has-val');
-                        }
-                    });
-                });
-
-                // --- Live Avatar Binding ---
-                document.addEventListener('DOMContentLoaded', function() {
-                    const skinColorRadios = document.querySelectorAll('input[name="skin_color"]');
-                    const facePath = document.getElementById('avatar-face');
-                    
-                    skinColorRadios.forEach(radio => {
-                        radio.addEventListener('change', function() {
-                            if(this.checked) {
-                                // The background color of the parent label holds the hex
-                                const color = this.parentElement.style.backgroundColor;
-                                if(color) facePath.style.fill = color;
-                            }
-                        });
-                    });
-
-                    // Hair Color & Styling Binding
-                    const hairColorRadios = document.querySelectorAll('input[name="hair_color"]');
-                    const hairBgPath = document.getElementById('avatar-hair-bg');
-                    const hairFrontPath = document.getElementById('avatar-hair-front');
-
-                    hairColorRadios.forEach(radio => {
-                        radio.addEventListener('change', function() {
-                            if(this.checked) {
-                                const color = this.parentElement.style.backgroundColor;
-                                if(color) {
-                                    hairBgPath.style.fill = color;
-                                    hairFrontPath.style.fill = color;
-                                }
-                            }
-                        });
-                    });
-
-                    const hairShapes = {
-                        "Straight": {
-                            bg: "M100,10 C150,10 190,40 190,100 C190,120 180,140 170,160 L160,160 C160,100 140,50 100,50 C60,50 40,100 40,160 L30,160 C20,140 10,120 10,100 C10,40 50,10 100,10 Z",
-                            front: "M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z"
-                        },
-                        "Wavy": {
-                            bg: "M100,10 C150,10 195,50 195,110 C195,130 185,150 175,170 L160,160 C160,100 140,50 100,50 C60,50 40,100 40,160 L25,170 C15,150 5,130 5,110 C5,50 50,10 100,10 Z",
-                            front: "M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z"
-                        },
-                        "Curly": {
-                            bg: "M100,0 C160,0 200,40 200,100 C200,140 180,180 150,180 C140,150 140,100 100,50 C60,100 60,150 50,180 C20,180 0,140 0,100 C0,40 40,0 100,0 Z",
-                            front: "M100,15 C150,15 170,40 180,80 C150,45 120,50 100,60 C80,50 50,45 20,80 C30,40 50,15 100,15 Z"
-                        },
-                        "Coily": {
-                            bg: "M100,-10 C170,-10 210,40 210,100 C210,150 180,190 140,190 C130,150 140,100 100,50 C60,100 70,150 60,190 C20,190 -10,150 -10,100 C-10,40 30,-10 100,-10 Z",
-                            front: "M100,10 C160,10 180,40 190,80 C160,40 120,45 100,55 C80,45 40,40 10,80 C20,40 40,10 100,10 Z"
-                        }
-                    };
-
-                    const hairTypeSelect = document.querySelector('select[name="hair_type"]');
-                    hairTypeSelect.addEventListener('change', function() {
-                        const style = this.value;
-                        if(hairShapes[style]) {
-                            hairBgPath.setAttribute('d', hairShapes[style].bg);
-                            hairFrontPath.setAttribute('d', hairShapes[style].front);
-                        }
-                    });
-
-                    const skinTypeSelect = document.querySelector('select[name="skin_type"]');
-                    const previewSkin = document.getElementById('preview-skin-type');
-                    skinTypeSelect.addEventListener('change', function() {
-                        previewSkin.innerText = this.value || "Awaiting Selection";
-                    });
-
-                    const scalpTypeSelect = document.querySelector('select[name="scalp_condition"]');
-                    const previewScalp = document.getElementById('preview-scalp-type');
-                    scalpTypeSelect.addEventListener('change', function() {
-                        previewScalp.innerText = this.value || "Awaiting Selection";
-                    });
-
-                    const tagContainer = document.getElementById('preview-tags-container');
-                    const dynamicCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-                    
-                    function updateTags() {
-                        tagContainer.innerHTML = '';
-                        dynamicCheckboxes.forEach(box => {
-                            if(box.checked) {
-                                const span = document.createElement('span');
-                                span.className = 'preview-tag';
-                                span.innerText = box.value;
-                                tagContainer.appendChild(span);
-                            }
-                        });
-                    }
-
-                    dynamicCheckboxes.forEach(box => {
-                        box.addEventListener('change', updateTags);
-                    });
-
-                    // Trigger instant avatar reflow based on any defaults or cached browser form values
-                    document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked, select').forEach(el => {
-                        if(el.value && el.value !== "") {
-                            el.dispatchEvent(new Event('change'));
-                        }
-                    });
-                });
+                window.AppConfig = {
+                    gender: "{{ session.get('gender', '') }}",
+                    age: parseInt("{{ session.get('age', 25) }}") || 25
+                };
             </script>
-            
-            <style>
-                .hidden { display: none !important; }
-                .radio-group-inline { display: flex; gap: 12px; margin-top: 0.5rem; flex-wrap: wrap;}
-                .radio-group-inline label { 
-                    cursor: pointer; 
-                    display: flex; 
-                    align-items: center; 
-                    gap: 6px;
-                    background: rgba(0, 0, 0, 0.04);
-                    padding: 10px 20px;
-                    border-radius: 12px;
-                    border: 1px solid var(--border-dark);
-                    font-weight: 500;
-                    color: var(--text-primary);
-                    transition: all 0.3s ease;
-                }
-                .radio-group-inline label:hover {
-                    background: rgba(0, 0, 0, 0.08);
-                }
-                .radio-group-inline label:has(input:checked) {
-                    background: var(--primary-light);
-                    border-color: var(--primary-color);
-                    color: var(--primary-color);
-                    font-weight: 700;
-                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
-                }
-                
-                /* Highlighted Select */
-                select.has-val {
-                    background-color: var(--primary-light) !important;
-                    border-color: var(--primary-color) !important;
-                    color: var(--primary-color) !important;
-                    font-weight: 700 !important;
-                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.1) !important;
-                }
-                
-                /* Step Form Styles */
-                .form-step {
-                    display: none;
-                    opacity: 0;
-                    transform: translateX(20px);
-                    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-                    flex-direction: column;
-                    min-height: 480px; /* Ensures buttons don't jump up and down drastically */
-                }
-                .form-step.active {
-                    display: flex; /* Changed from block to flex for internal alignment */
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-                
-                .step-indicator {
-                    text-align: center;
-                    margin-bottom: 30px;
-                }
-                #step-text {
-                    font-size: 0.95rem;
-                    color: var(--text-secondary);
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                }
-                .progress-bar-container {
-                    width: 100%;
-                    height: 6px;
-                    background: var(--border-color);
-                    border-radius: 4px;
-                    margin-top: 10px;
-                    overflow: hidden;
-                }
-                .progress-bar-fill {
-                    height: 100%;
-                    width: 0%;
-                    background: var(--primary-color);
-                    transition: width 0.4s ease;
-                }
-                
-                .step-buttons {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: auto; /* Pushes the buttons to the bottom of the flex container */
-                    padding-top: 24px;
-                    border-top: 1px solid var(--border-color);
-                    width: 100%;
-                }
-                .step-buttons button {
-                    padding: 12px 24px;
-                    border-radius: 12px;
-                    font-size: 1.05rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                }
-                .btn-next {
-                    background: var(--primary-color);
-                    color: white;
-                    border: none;
-                    margin-left: auto;
-                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
-                }
-                .btn-next:hover {
-                    background: var(--primary-hover);
-                    transform: translateY(-2px);
-                }
-                .btn-back {
-                    background: transparent;
-                    color: var(--text-secondary);
-                    border: 1px solid var(--border-color);
-                }
-                .btn-back:hover {
-                    background: rgba(0,0,0,0.05);
-                    color: var(--text-primary);
-                }
-            </style>
+            <script src="{{ url_for('static', filename='js/character_builder.js') }}" defer></script>
 
             <!-- SECTION 3: ALLERGIES -->
             <div class="section-title">🚫 Allergies</div>
@@ -627,6 +295,7 @@
             </div>
 
                 <div class="step-buttons">
+                    <button type="button" class="btn-back" onclick="showStep(2)">⬅ Back</button>
                     <button type="submit" class="btn-create">✨ Generate My Profile</button>
                 </div>
             </div> <!-- End Step 3 -->
@@ -641,30 +310,121 @@
                         <div class="pulse-dot"></div>
                     </div>
                     
-                    <div class="avatar-canvas">
-                        <svg viewBox="0 8 200 192" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Background Hair Base -->
-                            <path id="avatar-hair-bg" d="M100,10 C150,10 190,40 190,100 C190,120 180,140 170,160 L160,160 C160,100 140,50 100,50 C60,50 40,100 40,160 L30,160 C20,140 10,120 10,100 C10,40 50,10 100,10 Z" fill="#2C1E16" style="transition: d 0.6s cubic-bezier(0.25, 1, 0.5, 1), fill 0.4s ease;"/>
-                            <!-- Face Base -->
-                            <path id="avatar-face" d="M100,180 C150,180 170,140 170,90 C170,40 140,30 100,30 C60,30 30,40 30,90 C30,140 50,180 100,180 Z" fill="#E0AC84" style="transition: fill 0.4s ease;"/>
+                    <div class="avatar-canvas" id="avatar-wrap">
+
+                        <!-- FEMALE AVATAR (shown if gender=Female) -->
+                        <svg id="avatar-female" viewBox="0 8 200 192" xmlns="http://www.w3.org/2000/svg" class="avatar-hidden">
+                            <!-- Background Hair Base (Long) -->
+                            <path id="f-hair-bg" d="M100,10 C155,10 200,45 200,105 C200,155 185,185 160,200 L155,200 C155,170 160,130 160,100 C160,55 135,35 100,35 C65,35 40,55 40,100 C40,130 45,170 45,200 L40,200 C15,185 0,155 0,105 C0,45 45,10 100,10 Z" fill="#2C1E16" class="path-transition-1"/>
+                            <!-- Face -->
+                            <path id="f-face" d="M100,185 C148,185 168,148 168,95 C168,42 140,28 100,28 C60,28 32,42 32,95 C32,148 52,185 100,185 Z" fill="#E0AC84" class="path-transition-2"/>
                             <!-- Eyes -->
+                            <circle cx="76" cy="98" r="6" fill="#222"/>
+                            <circle cx="124" cy="98" r="6" fill="#222"/>
+                            <!-- Eyelashes -->
+                            <path d="M70,92 Q76,88 82,92" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
+                            <path d="M118,92 Q124,88 130,92" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
+                            <!-- Lips -->
+                            <path d="M86,145 Q100,158 114,145" fill="none" stroke="#c0626a" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Age overlays: wrinkles appear for 30-50/50+ --> 
+                            <g id="f-age-overlay" opacity="0">
+                                <!-- Forehead lines (50+) -->
+                                <path id="f-wrinkle-forehead" d="M75,68 Q100,64 125,68" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+                                <path d="M80,75 Q100,72 120,75" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="1.2" stroke-linecap="round" opacity="0" id="f-wrinkle-forehead2"/>
+                                <!-- Eye-corner lines (30+) -->
+                                <path id="f-crow-feet" d="M134,102 L140,99 M134,106 L141,105 M134,110 L139,112" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="1" stroke-linecap="round" opacity="0"/>
+                                <path d="M66,102 L60,99 M66,106 L59,105 M66,110 L61,112" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="1" stroke-linecap="round" opacity="0" id="f-crow-feet-left"/>
+                                <!-- Smile/nasolabial lines (30+) -->
+                                <path id="f-smile-lines" d="M72,118 Q68,135 70,148" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="1.2" stroke-linecap="round" opacity="0"/>
+                                <path d="M128,118 Q132,135 130,148" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="1.2" stroke-linecap="round" opacity="0" id="f-smile-lines-r"/>
+                                <!-- Grey hair overlay (50+) -->
+                                <path id="f-grey-hair" d="M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z" fill="rgba(180,180,180,0)" class="path-transition-3"/>
+                            </g>
+                            <!-- Front Hair / Bangs (over the age layer) -->
+                            <path id="f-hair-front" d="M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z" fill="#2C1E16" class="path-transition-1"/>
+                        </svg>
+
+                        <!-- MALE AVATAR (shown if gender=Male) -->
+                        <svg id="avatar-male" viewBox="0 8 200 192" xmlns="http://www.w3.org/2000/svg" class="avatar-hidden">
+                            <!-- Short flat-top hair bg -->
+                            <path id="m-hair-bg" d="M100,20 C148,20 180,38 180,70 L180,90 L172,90 C168,60 148,44 100,44 C52,44 32,60 28,90 L20,90 L20,70 C20,38 52,20 100,20 Z" fill="#2C1E16" class="path-transition-1"/>
+                            <!-- Neck -->
+                            <rect x="88" y="172" width="24" height="22" rx="6" fill="#D4956A"/>
+                            <!-- Square jaw face - wider, squarer than female -->
+                            <path id="m-face" d="M38,75 L38,140 Q38,185 100,185 Q162,185 162,140 L162,75 Q162,40 100,40 Q38,40 38,75 Z" fill="#E0AC84" class="path-transition-2"/>
+                            <!-- Jaw stubble shadow -->
+                            <path d="M50,145 Q100,175 150,145 Q155,160 150,170 Q100,190 50,170 Q45,160 50,145 Z" fill="rgba(0,0,0,0.07)" rx="8"/>
+                            <!-- Eyes - slightly wider spaced, deeper set -->
+                            <circle cx="74" cy="102" r="8" fill="#222"/>
+                            <circle cx="126" cy="102" r="8" fill="#222"/>
+                            <!-- Heavy flat straight eyebrows - key male feature -->
+                            <rect x="60" y="84" width="30" height="5" rx="2" fill="#2C1E16"/>
+                            <rect x="110" y="84" width="30" height="5" rx="2" fill="#2C1E16"/>
+                            <!-- Nose bridge line -->
+                            <path d="M100,110 L96,128 Q100,133 104,128 L100,110" fill="rgba(0,0,0,0.1)"/>
+                            <!-- Strong flat mouth -->
+                            <path d="M82,152 L118,152" fill="none" stroke="#b07050" stroke-width="3.5" stroke-linecap="round"/>
+                            <!-- Short flat-top hair front -->
+                            <path id="m-hair-front" d="M38,75 Q38,30 100,28 Q162,30 162,75 L162,65 Q155,50 100,48 Q45,50 38,65 Z" fill="#2C1E16" class="path-transition-1"/>
+                            <!-- Age overlays for male -->
+                            <g id="m-age-overlay" opacity="0">
+                                <!-- Forehead creases (50+) -->
+                                <path id="m-wrinkle-forehead" d="M68,72 Q100,68 132,72" fill="none" stroke="rgba(0,0,0,0.13)" stroke-width="1.8" stroke-linecap="round" opacity="0"/>
+                                <path d="M72,80 Q100,76 128,80" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="1.4" stroke-linecap="round" opacity="0" id="m-wrinkle-forehead2"/>
+                                <!-- Crow's feet (30+) -->
+                                <path id="m-crow-feet" d="M136,105 L143,102 M136,109 L144,109 M136,113 L142,116" fill="none" stroke="rgba(0,0,0,0.13)" stroke-width="1.2" stroke-linecap="round" opacity="0"/>
+                                <path d="M62,105 L55,102 M62,109 L54,109 M62,113 L56,116" fill="none" stroke="rgba(0,0,0,0.13)" stroke-width="1.2" stroke-linecap="round" opacity="0" id="m-crow-feet-left"/>
+                                <!-- Nasolabial folds (30+) -->
+                                <path id="m-smile-lines" d="M68,122 Q64,140 66,154" fill="none" stroke="rgba(0,0,0,0.11)" stroke-width="1.5" stroke-linecap="round" opacity="0"/>
+                                <path d="M132,122 Q136,140 134,154" fill="none" stroke="rgba(0,0,0,0.11)" stroke-width="1.5" stroke-linecap="round" opacity="0" id="m-smile-lines-r"/>
+                                <!-- Grey temples (50+) -->
+                                <rect id="m-grey-temple-l" x="26" y="68" width="14" height="20" rx="4" fill="rgba(180,180,180,0)" class="path-transition-3"/>
+                                <rect id="m-grey-temple-r" x="160" y="68" width="14" height="20" rx="4" fill="rgba(180,180,180,0)" class="path-transition-3"/>
+                            </g>
+                        </svg>
+
+                        <!-- Fallback Generic Avatar -->
+                        <svg id="avatar-generic" viewBox="0 8 200 192" xmlns="http://www.w3.org/2000/svg">
+                            <path id="avatar-hair-bg" d="M100,10 C150,10 190,40 190,100 C190,120 180,140 170,160 L160,160 C160,100 140,50 100,50 C60,50 40,100 40,160 L30,160 C20,140 10,120 10,100 C10,40 50,10 100,10 Z" fill="#2C1E16" class="path-transition-1"/>
+                            <path id="avatar-face" d="M100,180 C150,180 170,140 170,90 C170,40 140,30 100,30 C60,30 30,40 30,90 C30,140 50,180 100,180 Z" fill="#E0AC84" class="path-transition-2"/>
                             <circle cx="75" cy="100" r="7" fill="#222"/>
                             <circle cx="125" cy="100" r="7" fill="#222"/>
-                            <!-- Gentle Smile -->
                             <path d="M85,140 Q100,155 115,140" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
-                            <!-- Front Hair / Bangs -->
-                            <path id="avatar-hair-front" d="M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z" fill="#2C1E16" style="transition: d 0.6s cubic-bezier(0.25, 1, 0.5, 1), fill 0.4s ease;"/>
+                            <path id="avatar-hair-front" d="M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z" fill="#2C1E16" class="path-transition-1"/>
                         </svg>
+
+                        <!-- Gender label badge -->
+                        <div id="gender-badge" class="gender-badge-style"></div>
                     </div>
 
                     <div class="preview-stats">
                         <div class="preview-stat-item">
-                            <span>Skin Pattern</span>
-                            <span class="highlight" id="preview-skin-type">Awaiting Selection</span>
+                            <span>🎂 Age</span>
+                            <span class="highlight" id="preview-age-group">{{ session.get('age', '—') }} yrs</span>
                         </div>
                         <div class="preview-stat-item">
-                            <span>Scalp Status</span>
-                            <span class="highlight" id="preview-scalp-type">Awaiting Selection</span>
+                            <span>🧍 Gender</span>
+                            <span class="highlight" id="preview-gender">{{ session.get('gender', 'Not set') }}</span>
+                        </div>
+                        <div class="preview-stat-item">
+                            <span>✨ Skin Type</span>
+                            <span class="highlight" id="preview-skin-type">Awaiting…</span>
+                        </div>
+                        <div class="preview-stat-item">
+                            <span>💧 Skin Oil</span>
+                            <span class="highlight" id="preview-oil-level">—</span>
+                        </div>
+                        <div class="preview-stat-item">
+                            <span>💇 Hair Type</span>
+                            <span class="highlight" id="preview-hair-type">Awaiting…</span>
+                        </div>
+                        <div class="preview-stat-item">
+                            <span>🌿 Scalp</span>
+                            <span class="highlight" id="preview-scalp-type">Awaiting…</span>
+                        </div>
+                        <div class="preview-stat-item">
+                            <span>🌞 Lifestyle</span>
+                            <span class="highlight" id="preview-lifestyle">Awaiting…</span>
                         </div>
                     </div>
 

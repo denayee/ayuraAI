@@ -14,6 +14,16 @@ def character_builder():
     if "user_id" not in session:
         return redirect(url_for("login.login"))
 
+    # Ensure gender and age are in session (may be missing for users logged in before this was added)
+    if "gender" not in session or "age" not in session:
+        db = get_db()
+        cur = db.cursor()
+        cur.execute("SELECT gender, age FROM users WHERE id = ?", (session["user_id"],))
+        row = cur.fetchone()
+        session["gender"] = row[0] if row and row[0] else "Not specified"
+        session["age"] = row[1] if row and row[1] else 25
+        db.close()
+
     if request.method == "POST":
         user_id = session["user_id"]
 

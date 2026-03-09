@@ -7,6 +7,9 @@
     justify-content: center;
     align-items: flex-start;
     animation: blurFadeIn 0.8s ease-out;
+    
+          
+    
 }
 
 .builder-card {
@@ -16,10 +19,13 @@
     width: 100%;
     max-width: 1100px;
     border-radius: 36px;
-    box-shadow: var(--glass-shadow);
+    box-shadow: rgba(0, 0, 0, 0) 40px 50px 25px -40px,
+        rgba(0, 0, 0, 0.2) 0px 25px 25px -5px;
     padding: 60px 70px;
     border: 1px solid var(--border-glass);
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    border: 2px solid darkslateblue;
+       
 }
 
 .builder-title {
@@ -415,4 +421,133 @@ input[type=range]::-webkit-slider-thumb:active {
         padding: 40px 30px;
         border-radius: 24px;
     }
+}
+
+/* Extracted from character_builder.html */
+.hidden { display: none !important; }
+                .radio-group-inline { display: flex; gap: 12px; margin-top: 0.5rem; flex-wrap: wrap;}
+                .radio-group-inline label { 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 6px;
+                    background: rgba(0, 0, 0, 0.04);
+                    padding: 10px 20px;
+                    border-radius: 12px;
+                    border: 1px solid var(--border-dark);
+                    font-weight: 500;
+                    color: var(--text-primary);
+                    transition: all 0.3s ease;
+                }
+                .radio-group-inline label:hover {
+                    background: rgba(0, 0, 0, 0.08);
+                }
+                .radio-group-inline label:has(input:checked) {
+                    background: var(--primary-light);
+                    border-color: var(--primary-color);
+                    color: var(--primary-color);
+                    font-weight: 700;
+                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+                }
+                
+                /* Highlighted Select */
+                select.has-val {
+                    background-color: var(--primary-light) !important;
+                    border-color: var(--primary-color) !important;
+                    color: var(--primary-color) !important;
+                    font-weight: 700 !important;
+                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.1) !important;
+                }
+                
+                /* Step Form Styles */
+                .form-step {
+                    display: none;
+                    opacity: 0;
+                    transform: translateX(20px);
+                    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+                    flex-direction: column;
+                    min-height: 480px; /* Ensures buttons don't jump up and down drastically */
+                }
+                .form-step.active {
+                    display: flex; /* Changed from block to flex for internal alignment */
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                
+                .step-indicator {
+                    text-align: center;
+                    margin-bottom: 30px;
+                }
+                #step-text {
+                    font-size: 0.95rem;
+                    color: var(--text-secondary);
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+                .progress-bar-container {
+                    width: 100%;
+                    height: 6px;
+                    background: var(--border-color);
+                    border-radius: 4px;
+                    margin-top: 10px;
+                    overflow: hidden;
+                }
+                .progress-bar-fill {
+                    height: 100%;
+                    width: 0%;
+                    background: var(--primary-color);
+                    transition: width 0.4s ease;
+                }
+                
+                .step-buttons {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: auto; /* Pushes the buttons to the bottom of the flex container */
+                    padding-top: 24px;
+                    border-top: 1px solid var(--border-color);
+                    width: 100%;
+                }
+                .step-buttons button {
+                    padding: 12px 24px;
+                    border-radius: 12px;
+                    font-size: 1.05rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+                .btn-next {
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    margin-left: auto;
+                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+                }
+                .btn-next:hover {
+                    background: var(--primary-hover);
+                    transform: translateY(-2px);
+                }
+                .btn-back {
+                    background: transparent;
+                    color: var(--text-secondary);
+                    border: 1px solid var(--border-color);
+                }
+                .btn-back:hover {
+                    background: rgba(0,0,0,0.05);
+                    color: var(--text-primary);
+                }
+
+.avatar-hidden { display: none; }
+
+.path-transition-1 { transition: d 0.6s ease, fill 0.4s ease; }
+.path-transition-2 { transition: fill 0.4s ease; }
+.path-transition-3 { transition: fill 0.5s ease; }
+
+.gender-badge-style {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
 }

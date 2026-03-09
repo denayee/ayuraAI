@@ -20,12 +20,13 @@ def login():
         try:
             cur = db.cursor()
             # Select password hash along with id and name
-            cur.execute("SELECT id, name, password FROM users WHERE email=?", (email,))
+            cur.execute("SELECT id, name, password, gender FROM users WHERE email=?", (email,))
             user = cur.fetchone()
 
             if user and check_password_hash(user[2], password):
                 session["user_id"] = user[0]
                 session["name"] = user[1]
+                session["gender"] = user[3] if user[3] else "Not specified"
 
                 # Check if profile is complete using the SAME connection
                 cur = db.cursor()

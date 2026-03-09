@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AyuraAI | Smart Beauty Recommendation</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -9,12 +10,14 @@
 
     <!-- Navbar -->
     <header class="navbar">
-        <a href="/" style="text-decoration: none;"><h1 class="logo">AyuraAI</h1></a>
-        <nav>
+        <a href="/"><h1 class="logo">AyuraAI</h1></a>
+
+        <!-- Desktop Nav -->
+        <nav class="nav-desktop">
             <a href="#features">Features</a>
             <a href="#how">How It Works</a>
             <a href="#contact">Contact</a>
-            
+
             {% if 'user_id' in session %}
                 <div class="user-menu">
                     <div class="user-avatar" id="avatar-btn">
@@ -35,7 +38,39 @@
                 <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
             </div>
         </nav>
+
+        <!-- Hamburger Button (mobile only) -->
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
     </header>
+
+    <!-- Mobile Nav Dropdown -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#features" class="mobile-nav-link">Features</a>
+        <a href="#how" class="mobile-nav-link">How It Works</a>
+        <a href="#contact" class="mobile-nav-link">Contact</a>
+        <hr class="mobile-nav-divider">
+        {% if 'user_id' in session %}
+            <div class="mobile-nav-user">
+                <span class="mobile-user-avatar">{{ session.get('name', 'U')[0] | upper }}</span>
+                <span>{{ session.get('name', 'User') }}</span>
+            </div>
+            {% if not session.get('profile_complete') %}
+                <a href="{{ url_for('character_builder.character_builder') }}" class="mobile-nav-link">✏️ Complete Profile</a>
+            {% endif %}
+            <a href="{{ url_for('recommendation.recommendation') }}" class="mobile-nav-link">🤖 AI Recommendation</a>
+            <a href="{{ url_for('login.logout') }}" class="mobile-nav-link mobile-nav-logout">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login.login') }}" class="mobile-nav-link">Login</a>
+            <a href="{{ url_for('register.register') }}" class="mobile-nav-link mobile-nav-cta">✨ Get Started</a>
+        {% endif %}
+        <div class="mobile-theme-row">
+            <span>Theme</span>
+            <button class="theme-toggle-btn" id="themeToggleMobile" aria-label="Toggle dark mode">🌙</button>
+        </div>
+    </div>
+
 
     <!-- Flash Messages Container -->
     <div class="flash-toast-container">
@@ -65,40 +100,9 @@
         <p>© 2026 AyuraAI | AI-Based Cosmetic & Home Remedy System</p>
     </footer>
 
-    <script>
-        const themeToggle = document.getElementById('themeToggle');
-        const currentTheme = localStorage.getItem('theme');
-        
-        if (currentTheme) {
-            document.documentElement.setAttribute('data-theme', currentTheme);
-            if (currentTheme === 'dark') {
-                themeToggle.textContent = '☀️';
-            }
-        }
+    <!-- Main JS (Theme, Nav, UI Globals) -->
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
-        themeToggle.addEventListener('click', () => {
-            let theme = document.documentElement.getAttribute('data-theme');
-            if (theme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-                themeToggle.textContent = '🌙';
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-                themeToggle.textContent = '☀️';
-            }
-        });
 
-        // Cute Greeting Popup auto-remove logic
-        const flashMessages = document.querySelectorAll('.flash-message');
-        if (flashMessages.length > 0) {
-            flashMessages.forEach(msg => {
-                setTimeout(() => {
-                    msg.classList.add('fade-out');
-                    setTimeout(() => msg.remove(), 400); // Shorter fade wait
-                }, 1500); // Display for exactly 1.5 seconds
-            });
-        }
-    </script>
 </body>
 </html>
