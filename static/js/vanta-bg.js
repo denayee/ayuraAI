@@ -1,18 +1,40 @@
-// Initialize Vanta NET on the hero container to act as a poster-style background
-if (typeof VANTA !== 'undefined' && VANTA.NET) {
-  VANTA.NET({
-    el: "#vanta-poster",
-    mouseControls: true,
-    touchControls: true,
-    gyroControls: false,
-    minHeight: 200.00,
-    minWidth: 200.00,
-    scale: 1.00,
-    scaleMobile: 1.00,
-    backgroundColor: 0x0f172a,
-    color: 0x2ecc71,
-    points: 8.00,
-    maxDistance: 20.00,
-    spacing: 15.00
-  });
+// Initialize Vanta Globe on the hero container
+function setVanta() {
+  try {
+    if (typeof VANTA === 'undefined' || !VANTA.GLOBE) return;
+    if (window.vantaEffect) {
+      window.vantaEffect.destroy()
+      window.vantaEffect = null
+    }
+    window.vantaEffect = VANTA.GLOBE({
+      el: "#vanta-poster",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x3fff82,
+      color2: 0x0,
+      backgroundColor: 0xffffff
+    })
+  } catch (e) {
+    console.warn('Vanta init failed', e)
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setVanta)
+} else {
+  setVanta()
+}
+
+if (window._strk && typeof _strk.push === 'function') {
+  _strk.push(function() {
+    setVanta()
+    if (window.edit_page && edit_page.Event && typeof edit_page.Event.subscribe === 'function') {
+      window.edit_page.Event.subscribe("Page.beforeNewOneFadeIn", setVanta)
+    }
+  })
 }
