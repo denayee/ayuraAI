@@ -6,3 +6,8 @@ requests
 beautifulsoup4
 python-dotenv
 gunicorn
+pandas
+numpy       
+scikit-learn
+
+

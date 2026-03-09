@@ -8,24 +8,73 @@
             <h1>Welcome, {{ session.get('name', 'User') }}</h1>
         </div>
 
-        <div class="ai-output-card">
-            <div class="ai-header-row">
-                <h2 class="ai-output-title">✨ Gemini Recommendations</h2>
-                <div class="date-badge" id="current-date">Today</div>
-            </div>
+        <div class="recommendation-grid">
             
-            <div class="loading-container" id="loading-spinner" style="display: none;">
-               <div class="spinner"></div>
-               <p>Analysing your profile...</p>
+            <!-- Left Side: ML Output -->
+            <div class="ml-output-card">
+                 <div class="ai-header-row">
+                    <h2 class="ai-output-title">🔍 Quick Insights</h2>
+                </div>
+                {% if ml_data %}
+                <div class="ml-insights-content">
+                    <div class="insight-badge">
+                        <span class="insight-label">Skin Profile:</span>
+                        <span class="insight-value">{{ ml_data.skin_prediction }}</span>
+                    </div>
+                    <div class="insight-badge">
+                        <span class="insight-label">Hair Profile:</span>
+                        <span class="insight-value">{{ ml_data.hair_prediction }}</span>
+                    </div>
+                    <div class="insight-badge">
+                        <span class="insight-label">Allergy Severity:</span>
+                        <span class="insight-value">Level {{ ml_data.allergy_severity }}</span>
+                    </div>
+
+                    <h3 class="product-title">Top Recommended Products</h3>
+                    <div class="product-list">
+                        {% for product in ml_data.products %}
+                        <div class="product-card">
+                            <span class="product-type {% if product.Type == 'Skin Care' %}skin-type{% else %}hair-type{% endif %}">{{ product.Type }}</span>
+                            <h4>{{ product.Product_Name }}</h4>
+                            <div class="product-tags">
+                                {% if product.Fragrance_Free == 1 %}<span class="ptag">Fragrance-Free</span>{% endif %}
+                                {% if product.Alcohol_Free == 1 %}<span class="ptag">Alcohol-Free</span>{% endif %}
+                                {% if product.Paraben_Free == 1 %}<span class="ptag">Paraben-Free</span>{% endif %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <p>No specific products found for this exact profile match.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                 <div class="loading-container">
+                    <p>Complete your profile to unlock insights.</p>
+                 </div>
+                {% endif %}
             </div>
 
-            <div class="ai-output-content" id="ai-content">
-                <!-- Content will be rendered here by marked.js -->
+            <!-- Right Side: Gemini AI Output -->
+            <div class="ai-output-card">
+                <div class="ai-header-row">
+                    <h2 class="ai-output-title">✨ Gemini Recommendations</h2>
+                    <div class="date-badge" id="current-date">Today</div>
+                </div>
+                
+                <div class="loading-container" id="loading-spinner" style="display: none;">
+                   <div class="spinner"></div>
+                   <p>Analysing your profile...</p>
+                </div>
+
+                <div class="ai-output-content" id="ai-content">
+                    <!-- Content will be rendered here by marked.js -->
+                </div>
+                
+                <!-- Hidden raw content -->
+                <div id="raw-content" style="display: none;">{{ ai_output }}</div>
             </div>
-            
-            <!-- Hidden raw content -->
-            <div id="raw-content" style="display: none;">{{ ai_output }}</div>
-        </div>
+
+        </div> <!-- end recommendation-grid -->
 
         <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <script>

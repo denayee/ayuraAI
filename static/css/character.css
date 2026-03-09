@@ -135,6 +135,8 @@ select option:checked {
 .color-option {
     width: 44px;
     height: 44px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     cursor: pointer;
     position: relative;
@@ -167,9 +169,11 @@ select option:checked {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    gap: 12px;
 }
 
 .checkbox-group.wide {
+    gap: 16px;
     gap: 16px;
 }
 
@@ -193,6 +197,11 @@ select option:checked {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
     border-color: var(--border-glass);
+}
+
+.checkbox-group label:hover {
+    background-color: #f1f5f9;
+    transform: translateY(-2px);
 }
 
 .checkbox-group label:has(input:checked) {
@@ -395,6 +404,7 @@ input[type=range]::-webkit-slider-thumb:active {
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
 
     .form-group.full {
