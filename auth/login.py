@@ -39,7 +39,7 @@ def login():
                 hair_exists = cur.fetchone()[0] > 0
                 session["profile_complete"] = skin_exists and hair_exists
 
-                flash("Login successful!", "success")
+                flash("Welcome back 🌸 Let's glow!", "success")
                 return redirect(url_for("recommendation.recommendation"))
             else:
                 flash("Invalid email or password", "error")

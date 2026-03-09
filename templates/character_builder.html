@@ -8,10 +8,22 @@
         <h2 class="builder-title">Welcome, {{ session.get('name', 'User') }}! <br>Create Your Avatar</h2>
         <p class="builder-subtitle">Define your unique skin & hair profile for personalized AI care.</p>
 
-        <form action="{{ url_for('character_builder.character_builder') }}" method="POST" class="builder-form">
+        <div class="builder-layout-split">
+            <!-- LEFT COLUMN: FORM -->
+            <div class="builder-form-section">
+                <!-- Step Progress Indicator -->
+        <div class="step-indicator">
+            <span id="step-text">Step 1 of 3</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <form action="{{ url_for('character_builder.character_builder') }}" method="POST" class="builder-form" id="character-form">
             
-            <!-- SECTION 1: SKIN -->
-            <div class="section-title">✨ Skin Profile</div>
+            <!-- SECTION 1: SKIN (STEP 1) -->
+            <div class="form-step active" id="step-1">
+                <div class="section-title">✨ Skin Profile</div>
             <div class="form-grid">
                 
                 <div class="form-group">
@@ -124,10 +136,16 @@
                     </div>
                 </div>
 
-            </div>
+            </div> <!-- End Skin Grid -->
 
-             <!-- SECTION 2: HAIR -->
-            <div class="section-title">💇‍♀️ Hair Profile</div>
+                <div class="step-buttons">
+                    <button type="button" class="btn-next" onclick="nextStep(2)">Next ➔</button>
+                </div>
+            </div> <!-- End Step 1 -->
+
+             <!-- SECTION 2: HAIR (STEP 2) -->
+             <div class="form-step" id="step-2">
+                <div class="section-title">💇‍♀️ Hair Profile</div>
             <div class="form-grid">
                 
                 <div class="form-group">
@@ -242,6 +260,14 @@
                 </div>
             </div>
 
+            <div class="step-buttons">
+                <button type="button" class="btn-next" onclick="nextStep(3)">Next ➔</button>
+            </div>
+            </div> <!-- End Step 2 -->
+
+            <!-- SECTION 3: ALLERGIES (STEP 3) -->
+            <div class="form-step" id="step-3">
+
             <!-- Script for Dynamic Logic -->
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -310,12 +336,278 @@
                          if(hairDrynessPresenceNo && condition !== '') hairDrynessPresenceNo.click();
                     }
                 }
+
+                // --- 3-Step Navigation Logic ---
+                let currentStep = 1;
+                const totalSteps = 3;
+
+                function updateProgress() {
+                    document.getElementById('step-text').innerText = `Step ${currentStep} of ${totalSteps}`;
+                    const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+                    document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+                }
+
+                function showStep(step) {
+                    // Hide all
+                    document.querySelectorAll('.form-step').forEach(el => {
+                        el.classList.remove('active');
+                        el.style.display = 'none';
+                    });
+                    
+                    // Show target
+                    const target = document.getElementById(`step-${step}`);
+                    target.style.display = 'block';
+                    // Trigger reflow for animation
+                    void target.offsetWidth;
+                    target.classList.add('active');
+                    
+                    currentStep = step;
+                    updateProgress();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+
+                function nextStep(step) {
+                    // Very basic validation - check if required fields in current step are filled
+                    const currentContainer = document.getElementById(`step-${currentStep}`);
+                    const requiredInputs = currentContainer.querySelectorAll('input[required], select[required]');
+                    let allValid = true;
+                    
+                    requiredInputs.forEach(input => {
+                        if (!input.value || (input.type === 'radio' && !currentContainer.querySelector(`input[name="${input.name}"]:checked`))) {
+                            allValid = false;
+                            input.reportValidity(); // Show native browser warning
+                        }
+                    });
+
+                    if (allValid) {
+                        showStep(step);
+                    }
+                }
+
+                // Add selected highlight to dropdowns
+                document.querySelectorAll('select').forEach(sel => {
+                    sel.addEventListener('change', function() {
+                        if(this.value && this.value !== "") {
+                            this.classList.add('has-val');
+                        } else {
+                            this.classList.remove('has-val');
+                        }
+                    });
+                });
+
+                // --- Live Avatar Binding ---
+                document.addEventListener('DOMContentLoaded', function() {
+                    const skinColorRadios = document.querySelectorAll('input[name="skin_color"]');
+                    const facePath = document.getElementById('avatar-face');
+                    
+                    skinColorRadios.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            if(this.checked) {
+                                // The background color of the parent label holds the hex
+                                const color = this.parentElement.style.backgroundColor;
+                                if(color) facePath.style.fill = color;
+                            }
+                        });
+                    });
+
+                    // Hair Color & Styling Binding
+                    const hairColorRadios = document.querySelectorAll('input[name="hair_color"]');
+                    const hairBgPath = document.getElementById('avatar-hair-bg');
+                    const hairFrontPath = document.getElementById('avatar-hair-front');
+
+                    hairColorRadios.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            if(this.checked) {
+                                const color = this.parentElement.style.backgroundColor;
+                                if(color) {
+                                    hairBgPath.style.fill = color;
+                                    hairFrontPath.style.fill = color;
+                                }
+                            }
+                        });
+                    });
+
+                    const hairShapes = {
+                        "Straight": {
+                            bg: "M100,10 C150,10 190,40 190,100 C190,120 180,140 170,160 L160,160 C160,100 140,50 100,50 C60,50 40,100 40,160 L30,160 C20,140 10,120 10,100 C10,40 50,10 100,10 Z",
+                            front: "M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z"
+                        },
+                        "Wavy": {
+                            bg: "M100,10 C150,10 195,50 195,110 C195,130 185,150 175,170 L160,160 C160,100 140,50 100,50 C60,50 40,100 40,160 L25,170 C15,150 5,130 5,110 C5,50 50,10 100,10 Z",
+                            front: "M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z"
+                        },
+                        "Curly": {
+                            bg: "M100,0 C160,0 200,40 200,100 C200,140 180,180 150,180 C140,150 140,100 100,50 C60,100 60,150 50,180 C20,180 0,140 0,100 C0,40 40,0 100,0 Z",
+                            front: "M100,15 C150,15 170,40 180,80 C150,45 120,50 100,60 C80,50 50,45 20,80 C30,40 50,15 100,15 Z"
+                        },
+                        "Coily": {
+                            bg: "M100,-10 C170,-10 210,40 210,100 C210,150 180,190 140,190 C130,150 140,100 100,50 C60,100 70,150 60,190 C20,190 -10,150 -10,100 C-10,40 30,-10 100,-10 Z",
+                            front: "M100,10 C160,10 180,40 190,80 C160,40 120,45 100,55 C80,45 40,40 10,80 C20,40 40,10 100,10 Z"
+                        }
+                    };
+
+                    const hairTypeSelect = document.querySelector('select[name="hair_type"]');
+                    hairTypeSelect.addEventListener('change', function() {
+                        const style = this.value;
+                        if(hairShapes[style]) {
+                            hairBgPath.setAttribute('d', hairShapes[style].bg);
+                            hairFrontPath.setAttribute('d', hairShapes[style].front);
+                        }
+                    });
+
+                    const skinTypeSelect = document.querySelector('select[name="skin_type"]');
+                    const previewSkin = document.getElementById('preview-skin-type');
+                    skinTypeSelect.addEventListener('change', function() {
+                        previewSkin.innerText = this.value || "Awaiting Selection";
+                    });
+
+                    const scalpTypeSelect = document.querySelector('select[name="scalp_condition"]');
+                    const previewScalp = document.getElementById('preview-scalp-type');
+                    scalpTypeSelect.addEventListener('change', function() {
+                        previewScalp.innerText = this.value || "Awaiting Selection";
+                    });
+
+                    const tagContainer = document.getElementById('preview-tags-container');
+                    const dynamicCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+                    
+                    function updateTags() {
+                        tagContainer.innerHTML = '';
+                        dynamicCheckboxes.forEach(box => {
+                            if(box.checked) {
+                                const span = document.createElement('span');
+                                span.className = 'preview-tag';
+                                span.innerText = box.value;
+                                tagContainer.appendChild(span);
+                            }
+                        });
+                    }
+
+                    dynamicCheckboxes.forEach(box => {
+                        box.addEventListener('change', updateTags);
+                    });
+
+                    // Trigger instant avatar reflow based on any defaults or cached browser form values
+                    document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked, select').forEach(el => {
+                        if(el.value && el.value !== "") {
+                            el.dispatchEvent(new Event('change'));
+                        }
+                    });
+                });
             </script>
             
             <style>
                 .hidden { display: none !important; }
-                .radio-group-inline { display: flex; gap: 1rem; margin-top: 0.5rem; }
-                .radio-group-inline label { cursor: pointer; display: flex; align-items: center; gap: 0.3rem;}
+                .radio-group-inline { display: flex; gap: 12px; margin-top: 0.5rem; flex-wrap: wrap;}
+                .radio-group-inline label { 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 6px;
+                    background: rgba(0, 0, 0, 0.04);
+                    padding: 10px 20px;
+                    border-radius: 12px;
+                    border: 1px solid var(--border-dark);
+                    font-weight: 500;
+                    color: var(--text-primary);
+                    transition: all 0.3s ease;
+                }
+                .radio-group-inline label:hover {
+                    background: rgba(0, 0, 0, 0.08);
+                }
+                .radio-group-inline label:has(input:checked) {
+                    background: var(--primary-light);
+                    border-color: var(--primary-color);
+                    color: var(--primary-color);
+                    font-weight: 700;
+                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+                }
+                
+                /* Highlighted Select */
+                select.has-val {
+                    background-color: var(--primary-light) !important;
+                    border-color: var(--primary-color) !important;
+                    color: var(--primary-color) !important;
+                    font-weight: 700 !important;
+                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.1) !important;
+                }
+                
+                /* Step Form Styles */
+                .form-step {
+                    display: none;
+                    opacity: 0;
+                    transform: translateX(20px);
+                    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+                    flex-direction: column;
+                    min-height: 480px; /* Ensures buttons don't jump up and down drastically */
+                }
+                .form-step.active {
+                    display: flex; /* Changed from block to flex for internal alignment */
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                
+                .step-indicator {
+                    text-align: center;
+                    margin-bottom: 30px;
+                }
+                #step-text {
+                    font-size: 0.95rem;
+                    color: var(--text-secondary);
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+                .progress-bar-container {
+                    width: 100%;
+                    height: 6px;
+                    background: var(--border-color);
+                    border-radius: 4px;
+                    margin-top: 10px;
+                    overflow: hidden;
+                }
+                .progress-bar-fill {
+                    height: 100%;
+                    width: 0%;
+                    background: var(--primary-color);
+                    transition: width 0.4s ease;
+                }
+                
+                .step-buttons {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: auto; /* Pushes the buttons to the bottom of the flex container */
+                    padding-top: 24px;
+                    border-top: 1px solid var(--border-color);
+                    width: 100%;
+                }
+                .step-buttons button {
+                    padding: 12px 24px;
+                    border-radius: 12px;
+                    font-size: 1.05rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+                .btn-next {
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    margin-left: auto;
+                    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
+                }
+                .btn-next:hover {
+                    background: var(--primary-hover);
+                    transform: translateY(-2px);
+                }
+                .btn-back {
+                    background: transparent;
+                    color: var(--text-secondary);
+                    border: 1px solid var(--border-color);
+                }
+                .btn-back:hover {
+                    background: rgba(0,0,0,0.05);
+                    color: var(--text-primary);
+                }
             </style>
 
             <!-- SECTION 3: ALLERGIES -->
@@ -330,12 +622,58 @@
                     <label><input type="checkbox" name="allergies" value="Fragrance"> Fragrance</label>
                      <label><input type="checkbox" name="allergies" value="Aloe Vera"> Aloe Vera</label>
                     <label><input type="checkbox" name="allergies" value="Coconut"> Coconut</label>
-                     <label><input type="checkbox" name="allergies" value="Sulphates"> Sulphates</label>
+                 <label><input type="checkbox" name="allergies" value="Sulphates"> Sulphates</label>
                 </div>
             </div>
 
-            <button type="submit" class="btn-create">✨ Generate My Profile</button>
+                <div class="step-buttons">
+                    <button type="submit" class="btn-create">✨ Generate My Profile</button>
+                </div>
+            </div> <!-- End Step 3 -->
         </form>
+            </div> <!-- End builder-form-section -->
+
+            <!-- RIGHT COLUMN: AVATAR PREVIEW -->
+            <div class="builder-preview-section">
+                <div class="preview-sticky">
+                    <div class="preview-header">
+                        <h3>Live Profile</h3>
+                        <div class="pulse-dot"></div>
+                    </div>
+                    
+                    <div class="avatar-canvas">
+                        <svg viewBox="0 8 200 192" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background Hair Base -->
+                            <path id="avatar-hair-bg" d="M100,10 C150,10 190,40 190,100 C190,120 180,140 170,160 L160,160 C160,100 140,50 100,50 C60,50 40,100 40,160 L30,160 C20,140 10,120 10,100 C10,40 50,10 100,10 Z" fill="#2C1E16" style="transition: d 0.6s cubic-bezier(0.25, 1, 0.5, 1), fill 0.4s ease;"/>
+                            <!-- Face Base -->
+                            <path id="avatar-face" d="M100,180 C150,180 170,140 170,90 C170,40 140,30 100,30 C60,30 30,40 30,90 C30,140 50,180 100,180 Z" fill="#E0AC84" style="transition: fill 0.4s ease;"/>
+                            <!-- Eyes -->
+                            <circle cx="75" cy="100" r="7" fill="#222"/>
+                            <circle cx="125" cy="100" r="7" fill="#222"/>
+                            <!-- Gentle Smile -->
+                            <path d="M85,140 Q100,155 115,140" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Front Hair / Bangs -->
+                            <path id="avatar-hair-front" d="M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z" fill="#2C1E16" style="transition: d 0.6s cubic-bezier(0.25, 1, 0.5, 1), fill 0.4s ease;"/>
+                        </svg>
+                    </div>
+
+                    <div class="preview-stats">
+                        <div class="preview-stat-item">
+                            <span>Skin Pattern</span>
+                            <span class="highlight" id="preview-skin-type">Awaiting Selection</span>
+                        </div>
+                        <div class="preview-stat-item">
+                            <span>Scalp Status</span>
+                            <span class="highlight" id="preview-scalp-type">Awaiting Selection</span>
+                        </div>
+                    </div>
+
+                    <div class="preview-tags" id="preview-tags-container">
+                        <!-- Dynamic Tags Inside Here -->
+                    </div>
+                </div>
+            </div> <!-- End builder-preview-section -->
+        </div> <!-- End builder-layout-split -->
     </div>
 </div>
 {% endblock home %}

@@ -52,7 +52,7 @@ def register():
             session["name"] = (
                 name  # Optimize: Store name in session to avoid extra query in character_builder
             )
-            flash("Registration successful! Welcome.", "success")
+            flash("Yayyy 🎉 You're in!", "success")
             return redirect(url_for("character_builder.character_builder"))
         except sqlite3.IntegrityError:
             flash("Error: Email already exists", "error")
