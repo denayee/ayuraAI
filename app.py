@@ -7,6 +7,7 @@ from routes.recommendation import recommendation_bp
 from routes.ai_implement import ai_implement
 from routes.ML_prediction import prediction_bp
 from routes.account import account_bp
+from routes.product_search import product_search_bp
 from dotenv import load_dotenv
 import os
 
@@ -26,6 +27,7 @@ def add_header(response):
     response.headers["Expires"] = "0"
     return response
 
+
 @app.route("/")
 def home():
     if "user_id" in session:
@@ -42,6 +44,7 @@ app.register_blueprint(recommendation_bp, url_prefix="/routes")
 app.register_blueprint(ai_implement, url_prefix="/routes")
 app.register_blueprint(prediction_bp)
 app.register_blueprint(account_bp, url_prefix="/routes")
+app.register_blueprint(product_search_bp, url_prefix="/api")
 
 
 if __name__ == "__main__":

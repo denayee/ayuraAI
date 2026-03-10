@@ -13,6 +13,7 @@
             <select id="mobile-section-select" class="mobile-section-select">
                 <option value="ml-output-card">🔍 Quick Insights</option>
                 <option value="ai-output-card" selected>✨ Gemini Recommendations</option>
+                <option value="products-section">🛍️ Product Recommendations</option>
             </select>
             <div class="mobile-select-icon">▼</div>
         </div>
@@ -67,7 +68,7 @@
             <!-- Right Side: Gemini AI Output -->
             <div class="ai-output-card">
                 <div class="ai-header-row">
-                    <h2 class="ai-output-title">✨ Gemini Recommendations</h2>
+                    <h2 class="ai-output-title">✨ AyuraAI Recommendations</h2>
                     <div class="date-badge" id="current-date">Today</div>
                 </div>
                 
@@ -88,6 +89,65 @@
 
         </div> <!-- end recommendation-grid -->
 
+        <!-- Products Section -->
+        <div class="products-section">
+            <div class="products-header">
+                <h2>🛍️ Top Rated Products From All Stores</h2>
+                <p class="products-subtitle">Only the highest-rated products across Amazon, Flipkart & Nykaa</p>
+            </div>
+
+            <div class="store-tabs-container">
+                <button class="store-tab active" data-store="all" data-label="All Stores">
+                    <span class="tab-icon">🌟</span>
+                    <span class="tab-label">All Stores</span>
+                    <span class="tab-count" id="all-count">0</span>
+                </button>
+                <button class="store-tab" data-store="amazon" data-label="Amazon">
+                    <span class="tab-icon">📦</span>
+                    <span class="tab-label">Amazon</span>
+                    <span class="tab-count" id="amazon-count">0</span>
+                </button>
+                <button class="store-tab" data-store="flipkart" data-label="Flipkart">
+                    <span class="tab-icon">🛒</span>
+                    <span class="tab-label">Flipkart</span>
+                    <span class="tab-count" id="flipkart-count">0</span>
+                </button>
+                <button class="store-tab" data-store="nykaa" data-label="Nykaa">
+                    <span class="tab-icon">✨</span>
+                    <span class="tab-label">Nykaa</span>
+                    <span class="tab-count" id="nykaa-count">0</span>
+                </button>
+            </div>
+
+            <div class="search-query-display hidden-element" id="search-query-display">
+                <p><strong>AI Generated Search:</strong> <span id="generated-query"></span></p>
+            </div>
+
+            <div class="products-loading hidden-element" id="products-loading">
+                <div class="spinner-small"></div>
+                <p>Finding best-rated products...</p>
+            </div>
+
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be loaded here by JavaScript -->
+            </div>
+
+            <div class="load-more-container" id="load-more-container" style="display: none;">
+                <button id="load-more-btn" class="load-more-btn">
+                    <span class="load-more-text">📦 Load More Products</span>
+                </button>
+            </div>
+
+            <div class="no-more-container hidden-element" id="no-more-container">
+                <p>🎯 You've seen all top-rated products!</p>
+                <small>Try searching a different query or check back later for new products</small>
+            </div>
+
+            <div class="products-empty hidden-element" id="products-empty">
+                <p>No top-rated products found. Try searching again.</p>
+            </div>
+        </div>
+
         <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <script>
             window.RecConfig = {
@@ -98,6 +158,7 @@
             };
         </script>
         <script src="{{ url_for('static', filename='js/ai_recommendation.js') }}" defer></script>
+        <script src="{{ url_for('static', filename='js/product_search.js') }}" defer></script>
     </div>
     
 {% if profile_incomplete2 %}
