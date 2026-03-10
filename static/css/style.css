@@ -884,7 +884,56 @@ a:hover {
 }
 
 .form-group {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.auth-form {
+    position: relative;
+}
+
+.form-step {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    width: 100%;
+}
+
+.step-active {
+    opacity: 1;
+    transform: translateX(0);
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.step-hidden-left {
+    opacity: 0;
+    transform: translateX(-30px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.step-hidden-right {
+    opacity: 0;
+    transform: translateX(30px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .form-group label {
@@ -912,6 +961,29 @@ a:hover {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: var(--primary-color);
 }
 
 .full-width {
@@ -944,6 +1016,34 @@ a:hover {
     font-weight: 500;
 }
 
+/* Auth page full-viewport background image (light/dark toggle) */
+body.has-auth-bg::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: url('/static/images/light.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
+    filter: brightness(1) saturate(1);
+    opacity: 1;
+}
+
+[data-theme="dark"] body.has-auth-bg::before {
+    background-image: url('/static/images/dark.png');
+    filter: brightness(0.65) saturate(0.85);
+}
+
+/* Make sure layout sits above the background */
+.auth-container,
+.navbar,
+.footer,
+.flash-toast-container {
+    position: relative;
+    z-index: 1;
+}
 /* Footer */
 .footer {
     color: var(--primary-color);

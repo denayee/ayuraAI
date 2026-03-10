@@ -1,0 +1,183 @@
+{% extends 'home.html' %}
+{% block home %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
+
+<div class="account-wrapper">
+    <div class="account-header">
+        <div class="account-avatar">
+            {{ user_info.name[0] | upper }}
+        </div>
+        <div class="account-header-info">
+            <h1>
+                <span id="header-name-text">{{ user_info.name }}</span>
+                <button class="name-edit-pencil" onclick="startEditName()" title="Edit name">✏️</button>
+            </h1>
+            <span class="account-username">@{{ user_info.username }}</span>
+            <span class="account-badge">
+                {% if user_info.auth_provider == 'google' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="14px" height="14px"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+                    Google Account
+                {% else %}
+                    ✉️ Email Account
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Account Details Card -->
+    <div class="account-card">
+        <h2 class="account-card-title">👤 Account Details</h2>
+        <div class="account-detail-grid">
+            <div class="detail-item">
+                <span class="detail-label">Full Name</span>
+                <span class="detail-value" id="name-display">
+                    <span id="name-text">{{ user_info.name }}</span>
+                    <button class="name-edit-pencil" onclick="startEditName()" title="Edit name">✏️</button>
+                </span>
+                <div id="name-edit-form" style="display: none;" class="name-edit-inline">
+                    <input type="text" id="name-input" value="{{ user_info.name }}" maxlength="100">
+                    <div class="name-edit-actions">
+                        <button onclick="saveName()" class="name-save-btn">✓</button>
+                        <button onclick="cancelEditName()" class="name-cancel-btn">✕</button>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Username</span>
+                <span class="detail-value">@{{ user_info.username }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">{{ user_info.email }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Age</span>
+                <span class="detail-value">{{ user_info.age }} years</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Gender</span>
+                <span class="detail-value">{{ user_info.gender }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Sign-in Method</span>
+                <span class="detail-value">{{ user_info.auth_provider | capitalize }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if user_profile %}
+    <!-- Skin Profile Card -->
+    <div class="account-card">
+        <h2 class="account-card-title">✨ Skin Profile</h2>
+        <div class="account-detail-grid">
+            <div class="detail-item">
+                <span class="detail-label">Skin Type</span>
+                <span class="detail-value">{{ user_profile.skin_type }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Skin Color</span>
+                <span class="detail-value">
+                    <span class="color-dot" style="background:{% if user_profile.skin_color == 'Fair' %}#F8D9C6{% elif user_profile.skin_color == 'Medium' %}#E0AC84{% elif user_profile.skin_color == 'Olive' %}#C68642{% elif user_profile.skin_color == 'Brown' %}#8D5524{% else %}#3B2219{% endif %};"></span>
+                    {{ user_profile.skin_color }}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Oil Level</span>
+                <span class="detail-value">{{ user_profile.oil_level }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Sensitivity</span>
+                <span class="detail-value">{{ user_profile.sensitivity_level }}/3</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Acne</span>
+                <span class="detail-value">{{ user_profile.acne_presence }}{% if user_profile.acne_presence == 'Yes' %} ({{ user_profile.acne_level }}){% endif %}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Dryness</span>
+                <span class="detail-value">{{ user_profile.dryness_presence }}{% if user_profile.dryness_presence == 'Yes' %} ({{ user_profile.dryness_level }}){% endif %}</span>
+            </div>
+        </div>
+        {% if user_profile.skin_problems %}
+        <div class="account-tags">
+            <span class="detail-label">Skin Concerns:</span>
+            {% for prob in user_profile.skin_problems.split(',') %}
+            <span class="account-tag">{{ prob.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Hair Profile Card -->
+    <div class="account-card">
+        <h2 class="account-card-title">💇 Hair Profile</h2>
+        <div class="account-detail-grid">
+            <div class="detail-item">
+                <span class="detail-label">Hair Type</span>
+                <span class="detail-value">{{ user_profile.hair_type }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Hair Color</span>
+                <span class="detail-value">
+                    <span class="color-dot" style="background:{% if user_profile.hair_color == 'Black' %}#090806{% elif user_profile.hair_color == 'Dark Brown' %}#3B3024{% elif user_profile.hair_color == 'Red' %}#B55239{% elif user_profile.hair_color == 'Blonde' %}#E6CEA8{% elif user_profile.hair_color == 'Light Brown' %}#A7856A{% else %}#E5E5E5{% endif %};"></span>
+                    {{ user_profile.hair_color }}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Scalp Condition</span>
+                <span class="detail-value">{{ user_profile.scalp_condition }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Hair Fall</span>
+                <span class="detail-value">{{ user_profile.hair_fall_level }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Dryness</span>
+                <span class="detail-value">{{ user_profile.hair_dryness_presence }}{% if user_profile.hair_dryness_presence == 'Yes' %} ({{ user_profile.hair_dryness_level }}){% endif %}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Scalp Itch</span>
+                <span class="detail-value">{{ user_profile.scalp_itch_presence }}{% if user_profile.scalp_itch_presence == 'Yes' %} ({{ user_profile.scalp_itch_level }}){% endif %}</span>
+            </div>
+        </div>
+        {% if user_profile.hair_problems %}
+        <div class="account-tags">
+            <span class="detail-label">Hair Concerns:</span>
+            {% for prob in user_profile.hair_problems.split(',') %}
+            <span class="account-tag">{{ prob.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Lifestyle & Allergies -->
+    <div class="account-card">
+        <h2 class="account-card-title">🌿 Lifestyle & Allergies</h2>
+        <div class="account-detail-grid">
+            <div class="detail-item">
+                <span class="detail-label">Environment</span>
+                <span class="detail-value">{{ user_profile.lifestyle }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Allergies</span>
+                <span class="detail-value">{{ user_profile.allergies }}</span>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="account-card" style="text-align: center; padding: 40px;">
+        <p style="font-size: 1.1em; color: var(--text-muted); margin-bottom: 16px;">You haven't completed your beauty profile yet!</p>
+        <a href="{{ url_for('character_builder.character_builder') }}" class="account-edit-btn">✨ Create Your Profile</a>
+    </div>
+    {% endif %}
+
+    <div class="account-actions">
+        <a href="{{ url_for('character_builder.character_builder') }}" class="account-edit-btn">✏️ Edit Profile</a>
+        <a href="{{ url_for('recommendation.recommendation') }}" class="account-secondary-btn">🤖 AI Recommendations</a>
+    </div>
+</div>
+
+<script>window.UPDATE_NAME_URL = '{{ url_for("account.update_name") }}';</script>
+<script src="{{ url_for('static', filename='js/account.js') }}" defer></script>
+
+{% endblock home %}

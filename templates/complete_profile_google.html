@@ -1,0 +1,48 @@
+{% extends 'home.html' %}
+{% block home %}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="cute-form-greeting">Almost there! ✨</div>
+        <h2>Complete Your Profile</h2>
+        <p>We just need a couple more details to personalize your experience</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="alert">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('google_auth.complete_profile') }}" method="POST" class="auth-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" required placeholder="Enter your age" min="18" max="120">
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="" disabled selected>Select your gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary full-width" style="margin-top: 15px;">Continue 🚀</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.body.classList.add('has-auth-bg');
+});
+</script>
+
+{% endblock home %}

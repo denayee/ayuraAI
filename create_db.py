@@ -8,10 +8,13 @@ cur.executescript("""
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    username TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    age INTEGER NOT NULL,
-    gender TEXT
+    password TEXT,
+    age INTEGER NOT NULL DEFAULT 0,
+    gender TEXT,
+    google_id TEXT UNIQUE,
+    auth_provider TEXT DEFAULT 'local'
 );
 
 CREATE TABLE IF NOT EXISTS skin_profile (

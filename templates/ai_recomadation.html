@@ -13,9 +13,6 @@
             <select id="mobile-section-select" class="mobile-section-select">
                 <option value="ml-output-card">🔍 Quick Insights</option>
                 <option value="ai-output-card" selected>✨ Gemini Recommendations</option>
-                {% if user_profile %}
-                <option value="profile-summary-card">👤 Your Profile</option>
-                {% endif %}
             </select>
             <div class="mobile-select-icon">▼</div>
         </div>
@@ -87,101 +84,7 @@
                 <div id="raw-content" class="hidden-element">{{ ai_output }}</div>
             </div>
 
-            {% if user_profile %}
-            <!-- Profile Card: Side-by-side with ML and Gemini -->
-            <div class="profile-summary-card">
-            <div class="profile-summary-header">
-                <div class="profile-avatar-mini" id="rec-avatar-wrap">
-                    <!-- Female Mini Avatar -->
-                    <svg id="rec-avatar-female" viewBox="0 8 200 192" xmlns="http://www.w3.org/2000/svg" class="mini-avatar-svg hidden-element">
-                        <path d="M100,10 C155,10 200,45 200,105 C200,155 185,185 160,200 L155,200 C155,170 160,130 160,100 C160,55 135,35 100,35 C65,35 40,55 40,100 C40,130 45,170 45,200 L40,200 C15,185 0,155 0,105 C0,45 45,10 100,10 Z" fill="#2C1E16"/>
-                        <path d="M100,185 C148,185 168,148 168,95 C168,42 140,28 100,28 C60,28 32,42 32,95 C32,148 52,185 100,185 Z" id="rec-f-face" fill="#E0AC84"/>
-                        <circle cx="76" cy="98" r="6" fill="#222"/><circle cx="124" cy="98" r="6" fill="#222"/>
-                        <path d="M70,92 Q76,88 82,92" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
-                        <path d="M118,92 Q124,88 130,92" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
-                        <path d="M86,145 Q100,158 114,145" fill="none" stroke="#c0626a" stroke-width="3" stroke-linecap="round"/>
-                        <path id="rec-f-hair" d="M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z" fill="#2C1E16"/>
-                    </svg>
-                    <!-- Male Mini Avatar -->
-                    <svg id="rec-avatar-male" viewBox="0 8 200 192" xmlns="http://www.w3.org/2000/svg" class="mini-avatar-svg hidden-element">
-                        <path d="M100,20 C148,20 180,38 180,70 L180,90 L172,90 C168,60 148,44 100,44 C52,44 32,60 28,90 L20,90 L20,70 C20,38 52,20 100,20 Z" fill="#2C1E16"/>
-                        <path d="M38,75 L38,140 Q38,185 100,185 Q162,185 162,140 L162,75 Q162,40 100,40 Q38,40 38,75 Z" id="rec-m-face" fill="#E0AC84"/>
-                        <circle cx="74" cy="102" r="8" fill="#222"/><circle cx="126" cy="102" r="8" fill="#222"/>
-                        <rect x="60" y="84" width="30" height="5" rx="2" fill="#2C1E16"/>
-                        <rect x="110" y="84" width="30" height="5" rx="2" fill="#2C1E16"/>
-                        <path d="M82,152 L118,152" fill="none" stroke="#b07050" stroke-width="3.5" stroke-linecap="round"/>
-                        <path id="rec-m-hair" d="M38,75 Q38,30 100,28 Q162,30 162,75 L162,65 Q155,50 100,48 Q45,50 38,65 Z" fill="#2C1E16"/>
-                    </svg>
-                    <!-- Generic -->
-                    <svg id="rec-avatar-generic" viewBox="0 8 200 192" xmlns="http://www.w3.org/2000/svg" class="mini-avatar-svg">
-                        <path d="M100,10 C150,10 190,40 190,100 C190,120 180,140 170,160 L160,160 C160,100 140,50 100,50 C60,50 40,100 40,160 L30,160 C20,140 10,120 10,100 C10,40 50,10 100,10 Z" fill="#2C1E16"/>
-                        <path d="M100,180 C150,180 170,140 170,90 C170,40 140,30 100,30 C60,30 30,40 30,90 C30,140 50,180 100,180 Z" fill="#E0AC84"/>
-                        <circle cx="75" cy="100" r="7" fill="#222"/><circle cx="125" cy="100" r="7" fill="#222"/>
-                        <path d="M85,140 Q100,155 115,140" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
-                        <path d="M100,20 C140,20 160,40 170,80 C145,55 120,55 100,60 C80,55 55,55 30,80 C40,40 60,20 100,20 Z" fill="#2C1E16"/>
-                    </svg>
-                </div>
-                <div class="profile-avatar-info">
-                    <h2>{{ session.get('name', 'User') }}'s Profile</h2>
-                    <span class="profile-gender-badge">{{ user_profile.gender }} &bull; {{ user_profile.age }} yrs</span>
-                </div>
-            </div>
 
-            <div class="profile-data-grid">
-                <div class="profile-section-block">
-                    <h3>✨ Skin</h3>
-                    <div class="profile-row"><span>Type</span><span>{{ user_profile.skin_type }}</span></div>
-                    <div class="profile-row"><span>Color</span>
-                        <span class="skin-dot-label">
-                            <span class="skin-color-dot" style="background:{% if user_profile.skin_color == 'Fair' %}#F8D9C6{% elif user_profile.skin_color == 'Medium' %}#E0AC84{% elif user_profile.skin_color == 'Olive' %}#C68642{% elif user_profile.skin_color == 'Brown' %}#8D5524{% else %}#3B2219{% endif %};"></span>
-                            {{ user_profile.skin_color }}
-                        </span>
-                    </div>
-                    <div class="profile-row"><span>Oil Level</span><span>{{ user_profile.oil_level }}</span></div>
-                    <div class="profile-row"><span>Sensitivity</span><span>{{ user_profile.sensitivity_level }}/5</span></div>
-                    <div class="profile-row"><span>Acne</span><span>{{ user_profile.acne_presence }}{% if user_profile.acne_presence == 'Yes' %} ({{ user_profile.acne_level }}){% endif %}</span></div>
-                    <div class="profile-row"><span>Dryness</span><span>{{ user_profile.dryness_presence }}{% if user_profile.dryness_presence == 'Yes' %} ({{ user_profile.dryness_level }}){% endif %}</span></div>
-                    {% if user_profile.skin_problems %}
-                    <div class="profile-tags">
-                        {% for prob in user_profile.skin_problems.split(',') %}
-                        <span class="profile-tag">{{ prob.strip() }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="profile-section-block">
-                    <h3>💇 Hair</h3>
-                    <div class="profile-row"><span>Type</span><span>{{ user_profile.hair_type }}</span></div>
-                    <div class="profile-row"><span>Color</span>
-                        <span class="skin-dot-label">
-                            <span class="skin-color-dot" style="background:{% if user_profile.hair_color == 'Black' %}#090806{% elif user_profile.hair_color == 'Dark Brown' %}#3B3024{% elif user_profile.hair_color == 'Red' %}#B55239{% elif user_profile.hair_color == 'Blonde' %}#E6CEA8{% elif user_profile.hair_color == 'Light Brown' %}#A7856A{% else %}#E5E5E5{% endif %};"></span>
-                            {{ user_profile.hair_color }}
-                        </span>
-                    </div>
-                    <div class="profile-row"><span>Scalp</span><span>{{ user_profile.scalp_condition }}</span></div>
-                    <div class="profile-row"><span>Hair Fall</span><span>{{ user_profile.hair_fall_level }}</span></div>
-                    <div class="profile-row"><span>Dryness</span><span>{{ user_profile.hair_dryness_presence }}{% if user_profile.hair_dryness_presence == 'Yes' %} ({{ user_profile.hair_dryness_level }}){% endif %}</span></div>
-                    <div class="profile-row"><span>Scalp Itch</span><span>{{ user_profile.scalp_itch_presence }}{% if user_profile.scalp_itch_presence == 'Yes' %} ({{ user_profile.scalp_itch_level }}){% endif %}</span></div>
-                    {% if user_profile.hair_problems %}
-                    <div class="profile-tags">
-                        {% for prob in user_profile.hair_problems.split(',') %}
-                        <span class="profile-tag">{{ prob.strip() }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="profile-section-block">
-                    <h3>🌿 Lifestyle &amp; Allergies</h3>
-                    <div class="profile-row"><span>Environment</span><span>{{ user_profile.lifestyle }}</span></div>
-                    <div class="profile-row allergies-row"><span>Allergies</span><span>{{ user_profile.allergies }}</span></div>
-                </div>
-            </div>
-
-            <a href="{{ url_for('character_builder.character_builder') }}" class="profile-edit-btn">✏️ Edit Profile</a>
-        </div>
-        {% endif %}
 
         </div> <!-- end recommendation-grid -->
 

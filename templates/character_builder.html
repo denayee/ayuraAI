@@ -115,13 +115,12 @@
 
                 <div class="form-group">
                     <label>Sensitivity Level</label>
-                    <input type="range" name="sensitivity_level" min="1" max="5" step="1" list="sensitivity-markers">
+                    <input type="range" name="sensitivity_level" min="0" max="3" step="1" list="sensitivity-markers">
                     <datalist id="sensitivity-markers">
+                        <option value="0" label="None"></option>
                         <option value="1" label="Low"></option>
-                        <option value="2"></option>
-                        <option value="3" label="Med"></option>
-                        <option value="4"></option>
-                        <option value="5" label="High"></option>
+                        <option value="2" label="Med"></option>
+                        <option value="3" label="High"></option>
                     </datalist>
                     <!-- Shared Datalist for new 1-3 sliders -->
                     <datalist id="level-markers-3">
@@ -436,4 +435,24 @@
         </div> <!-- End builder-layout-split -->
     </div>
 </div>
+<!-- Fullscreen Loading Overlay for Profile Generation -->
+<div id="generate-loading-overlay">
+    <div class="loading-content">
+        <div class="loading-spinner-generate"></div>
+        <h2>Generating Your Profile ✨</h2>
+        <p>Gemini AI is analyzing your skin & hair attributes...</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const builderForm = document.getElementById('character-form');
+    if (builderForm) {
+        builderForm.addEventListener('submit', function() {
+            document.getElementById('generate-loading-overlay').classList.add('active');
+        });
+    }
+});
+</script>
+
 {% endblock home %}

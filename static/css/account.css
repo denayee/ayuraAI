@@ -1,0 +1,304 @@
+/* ========== Account Page ========== */
+
+.account-wrapper {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px 60px;
+}
+
+/* Header with Avatar */
+.account-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 32px;
+    padding: 28px 32px;
+    background: var(--surface-card);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.account-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8em;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.account-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.account-header-info h1 {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.account-username {
+    color: var(--text-muted);
+    font-size: 0.95em;
+    font-weight: 500;
+}
+
+.account-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 4px;
+    background: var(--surface-alt);
+    padding: 4px 12px;
+    border-radius: 20px;
+    width: fit-content;
+}
+
+/* Cards */
+.account-card {
+    background: var(--surface-card);
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    transition: box-shadow 0.2s ease;
+}
+
+.account-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.account-card-title {
+    font-size: 1.15em;
+    font-weight: 700;
+    margin: 0 0 18px 0;
+    color: var(--text-primary);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Detail Grid */
+.account-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-label {
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.detail-value {
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Color Dots */
+.color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1.5px solid rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+/* Tags */
+.account-tags {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.account-tag {
+    background: var(--surface-alt);
+    color: var(--text-primary);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.82em;
+    font-weight: 500;
+    border: 1px solid var(--border-color);
+}
+
+/* Action Buttons */
+.account-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.account-edit-btn,
+.account-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.account-edit-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.account-edit-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.account-secondary-btn {
+    background: var(--surface-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.account-secondary-btn:hover {
+    background: var(--surface-alt);
+    transform: translateY(-1px);
+}
+
+/* Inline Name Edit */
+.name-edit-pencil {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.65em;
+    padding: 2px 4px;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+    vertical-align: middle;
+}
+
+.name-edit-pencil:hover {
+    opacity: 1;
+}
+
+.name-edit-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.name-edit-inline input {
+    flex: 1;
+    padding: 6px 12px;
+    border: 1.5px solid var(--primary-color);
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--surface-card);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.name-edit-inline input:focus {
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 99,102,241), 0.15);
+}
+
+.name-edit-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.name-save-btn,
+.name-cancel-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.name-save-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.name-save-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.name-cancel-btn {
+    background: var(--surface-alt);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.name-cancel-btn:hover {
+    background: var(--border-color);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .account-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 20px;
+    }
+
+    .account-header-info {
+        align-items: center;
+    }
+
+    .account-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-actions {
+        flex-direction: column;
+    }
+
+    .account-edit-btn,
+    .account-secondary-btn {
+        width: 100%;
+    }
+}
