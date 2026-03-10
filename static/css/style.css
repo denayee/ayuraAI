@@ -135,10 +135,13 @@ a:hover {
     padding: 15px 5vw;
     background-color: var(--surface-color);
     border-bottom: 1px solid var(--border-color);
-    position: sticky;
+    position: sticky !important;
     top: 0;
     z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    background: transparent;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .navbar .logo {
@@ -1049,7 +1052,9 @@ body.has-auth-bg::before {
     color: var(--primary-color);
     text-align: center;
     padding: 30px 20px;
-    background: var(--surface-color);
+    background: transparent;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid var(--border-color);
 }
 
