@@ -64,17 +64,35 @@ document.addEventListener('DOMContentLoaded', function() {
         function updateMobileView() {
             if (window.innerWidth <= 768) {
                 const activeClass = mobSelect.value;
+                // Hide all sections
                 document.querySelectorAll('.recommendation-grid > div').forEach(el => {
                     el.classList.remove('active-mob-card');
-                    if (el.classList.contains(activeClass)) {
-                        el.classList.add('active-mob-card');
+                });
+                const productsSection = document.querySelector('.products-section');
+                if (productsSection) {
+                    productsSection.classList.remove('active-mob-card');
+                }
+                
+                // Show selected section
+                if (activeClass === 'products-section') {
+                    if (productsSection) {
+                        productsSection.classList.add('active-mob-card');
                     }
-                });
+                } else {
+                    const activeElement = document.querySelector(`.${activeClass}`);
+                    if (activeElement) {
+                        activeElement.classList.add('active-mob-card');
+                    }
+                }
             } else {
-                // Desktop: ensure all are visible via CSS, but clean up class just in case
+                // Desktop: ensure all are visible via CSS
                 document.querySelectorAll('.recommendation-grid > div').forEach(el => {
                     el.classList.remove('active-mob-card');
                 });
+                const productsSection = document.querySelector('.products-section');
+                if (productsSection) {
+                    productsSection.classList.remove('active-mob-card');
+                }
             }
         }
         mobSelect.addEventListener('change', updateMobileView);
