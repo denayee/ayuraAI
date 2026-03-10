@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
         currentOffset = 0;
         allProducts = [];
         productsByStore = {"amazon": [], "flipkart": [], "nykaa": []};
+        hasMore = false;
+        isExhausted = false;
+        isLoading = false;
         fetchTopRatedProducts();
     }
 
@@ -50,7 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
             showElement(productsLoading);
         }
 
-        // Send request to backend
+        // Send request to backend with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
         fetch('/routes/api/fetch-products', {
             method: 'POST',
             headers: {
@@ -60,10 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 min_rating: 4.0,
                 limit_per_store: 6,
                 offset: currentOffset
-            })
+            }),
+            signal: controller.signal
         })
         .then(response => response.json())
         .then(data => {
+            clearTimeout(timeoutId);
             isLoading = false;
             hideElement(productsLoading);
 
@@ -94,46 +102,102 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Display products for current filter
                 displayProductsByFilter(currentFilter);
                 
-                // Update Load More button
-                if (hasMore && !isExhausted) {
-                    showElement(loadMoreContainer);
-                    hideElement(noMoreContainer);
-                } else if (isExhausted) {
-                    hideElement(loadMoreContainer);
-                    showElement(noMoreContainer);
-                } else {
-                    hideElement(loadMoreContainer);
-                    showElement(noMoreContainer);
-                }
+                // Update Load More button visibility
+                updateLoadMoreVisibility();
             } else if (currentOffset === 0) {
                 // No products on first load
                 showElement(productsEmpty);
                 hideElement(loadMoreContainer);
                 hideElement(noMoreContainer);
+                hasMore = false;
+                isExhausted = true;
             } else {
-                // No more products on load more
+                // No more products on load more - mark as exhausted
                 hideElement(loadMoreContainer);
                 showElement(noMoreContainer);
+                hasMore = false;
                 isExhausted = true;
             }
         })
         .catch(error => {
+            clearTimeout(timeoutId);
             console.error('Error fetching products:', error);
             isLoading = false;
             hideElement(productsLoading);
+            
+            // Check if it was a timeout error
+            if (error.name === 'AbortError') {
+                console.error('Request timed out after 30 seconds');
+            }
+            
+            // On error: mark as exhausted to prevent infinite retries
+            hasMore = false;
+            isExhausted = true;
+            
             if (currentOffset === 0) {
+                // Show empty message on first load timeout
+                const emptyMsg = productsEmpty.querySelector('p') || productsEmpty;
+                if (emptyMsg.textContent) {
+                    emptyMsg.textContent = 'Unable to load products. Please try again later.';
+                }
                 showElement(productsEmpty);
+                hideElement(loadMoreContainer);
             } else {
+                // Show timeout message on load more
                 hideElement(loadMoreContainer);
                 showElement(noMoreContainer);
+                const noMoreMsg = noMoreContainer.querySelector('p');
+                if (noMoreMsg) {
+                    noMoreMsg.textContent = '⏱️ Loading took too long. Please try again.';
+                }
             }
         });
     }
 
+    // Update Load More button visibility based on state
+    function updateLoadMoreVisibility() {
+        if (hasMore && !isExhausted && !isLoading) {
+            showElement(loadMoreContainer);
+            hideElement(noMoreContainer);
+        } else if (isExhausted || !hasMore) {
+            hideElement(loadMoreContainer);
+            showElement(noMoreContainer);
+        } else {
+            hideElement(loadMoreContainer);
+            hideElement(noMoreContainer);
+        }
+    }
+
     // Load more products
     function loadMoreProducts() {
-        if (isLoading || !hasMore || isExhausted) return;
+        // Safety checks: prevent loading if already loading, no more products, or exhausted
+        if (isLoading) {
+            console.warn('Already loading products');
+            return;
+        }
+        if (isExhausted) {
+            console.warn('Products exhausted');
+            updateLoadMoreVisibility();
+            return;
+        }
+        if (!hasMore) {
+            console.warn('No more products available');
+            isExhausted = true;
+            updateLoadMoreVisibility();
+            return;
+        }
+        
+        // Safety: prevent excessive pagination attempts
+        const MAX_SAFE_OFFSET = 50;
+        if (currentOffset >= MAX_SAFE_OFFSET) {
+            console.warn('Maximum pagination limit reached');
+            isExhausted = true;
+            updateLoadMoreVisibility();
+            return;
+        }
+        
         currentOffset += 1;
+        console.log('Loading more products at offset:', currentOffset);
         fetchTopRatedProducts();
     }
 

@@ -47,20 +47,48 @@ def generate_search_query(user_profile):
         Do not include any explanation or additional text.
         """
 
-        response = gemini_client.models.generate_content(
-            model="gemini-3-flash-preview",
-            contents=prompt,
-        )
+        # Try models in order of preference
+        # Using latest available models
+        models_to_try = [
+            "gemini-2.5-flash",
+            "gemini-2.0-flash",
+            "gemini-3-flash-preview",
+        ]
 
-        if response.text:
-            return response.text.strip().strip("\"'")
-        elif response.candidates and response.candidates[0].content.parts:
-            return response.candidates[0].content.parts[0].text.strip().strip("\"'")
-        else:
-            return "skincare beauty products"
+        for model_name in models_to_try:
+            try:
+                print(f"Trying Gemini model: {model_name}")
+                response = gemini_client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+
+                if response.text:
+                    result = response.text.strip().strip("\"'")
+                    print(f"✓ Gemini query generated: {result}")
+                    return result
+                elif response.candidates and response.candidates[0].content.parts:
+                    result = (
+                        response.candidates[0]
+                        .content.parts[0]
+                        .text.strip()
+                        .strip("\"'")
+                    )
+                    print(f"✓ Gemini query generated: {result}")
+                    return result
+            except Exception as model_error:
+                print(f"Model {model_name} failed: {model_error}")
+                continue
+
+        # Fallback if all models fail
+        print("⚠ Gemini models failed, using default query")
+        return "skincare beauty products"
 
     except Exception as e:
         print(f"Error generating search query: {e}")
+        import traceback
+
+        traceback.print_exc()
         return "skincare beauty products"
 
 
@@ -90,7 +118,8 @@ def search_products_by_store(query, store="amazon"):
     }
 
     try:
-        response = requests.get(url, params=params)
+        # 15 second timeout for API call
+        response = requests.get(url, params=params, timeout=15)
         data = response.json()
 
         products = []
@@ -172,7 +201,14 @@ def search_all_stores(query, min_rating=4.0, limit_per_store=6, offset=0):
 
     # Check if more products are available
     has_more = end_idx < len(result)
-    is_exhausted = len(paginated_products) == 0 and offset > 0
+    # Exhausted when: no products at current offset AND either offset > 0 (not first page) OR result is totally empty
+    is_exhausted = len(paginated_products) == 0 or (offset > 0 and not has_more)
+
+    # Safety: prevent infinite pagination
+    max_offset = 100  # Safety limit
+    if offset >= max_offset:
+        is_exhausted = True
+        has_more = False
 
     return {
         "products": paginated_products,

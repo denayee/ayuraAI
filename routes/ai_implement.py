@@ -54,20 +54,37 @@ def generate_recommendation(user_profile):
         10. Product Recommendations: For each recommended product, include a brief description, key ingredients, and why it's suitable for the user's profile.
         """
 
-        response = client.models.generate_content(
-            model="gemini-3-flash-preview",
-            contents=prompt,
-        )
+        # Try models in order of preference
+        # Using latest available models for better quality
+        models_to_try = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-3-flash-preview"]
 
-        # Safe return (important)
-        if response.text:
-            return response.text
-        else:
-            return response.candidates[0].content.parts[0].text
+        for model_name in models_to_try:
+            try:
+                print(f"Trying Gemini model for recommendations: {model_name}")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+
+                # Safe return
+                if response.text:
+                    print(f"✓ Gemini recommendation generated with {model_name}")
+                    return response.text
+                elif response.candidates and response.candidates[0].content.parts:
+                    result = response.candidates[0].content.parts[0].text
+                    print(f"✓ Gemini recommendation generated with {model_name}")
+                    return result
+            except Exception as model_error:
+                print(f"Model {model_name} failed: {model_error}")
+                continue
+
+        # Fallback if all models fail
+        print("⚠ All Gemini models failed, returning default message")
+        return "Sorry, I couldn't generate a recommendation at this time. Please try again later."
 
     except Exception as e:
         import traceback
 
         traceback.print_exc()
         print(f"Error generating AI content: {e}")
-        return "Sorry, I couldn't generate a recommendation at this time nnnnn."
+        return "Sorry, I couldn't generate a recommendation at this time. Please try again later."
