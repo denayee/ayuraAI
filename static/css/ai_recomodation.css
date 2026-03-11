@@ -722,7 +722,7 @@
 
 /* Extracted from ai_recomadation.html */
 .hidden-element {
-    display: none;
+    display: none !important;
 }
 
 .mini-avatar-svg {

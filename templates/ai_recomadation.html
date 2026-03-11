@@ -123,16 +123,16 @@
                 <p><strong>AI Generated Search:</strong> <span id="generated-query"></span></p>
             </div>
 
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be loaded here by JavaScript -->
+            </div>
+
             <div class="products-loading hidden-element" id="products-loading">
                 <div class="spinner-small"></div>
                 <p>Finding best-rated products...</p>
             </div>
 
-            <div class="products-grid" id="products-grid">
-                <!-- Products will be loaded here by JavaScript -->
-            </div>
-
-            <div class="load-more-container" id="load-more-container" style="display: none;">
+            <div class="load-more-container hidden-element" id="load-more-container">
                 <button id="load-more-btn" class="load-more-btn">
                     <span class="load-more-text">📦 Load More Products</span>
                 </button>
@@ -144,7 +144,10 @@
             </div>
 
             <div class="products-empty hidden-element" id="products-empty">
-                <p>No top-rated products found. Try searching again.</p>
+                <p id="products-empty-msg">No top-rated products found. Try searching again.</p>
+                <button id="retry-btn" class="load-more-btn hidden-element" onclick="document.getElementById('load-more-btn').click()">
+                    🔄 Try Again
+                </button>
             </div>
         </div>
 
