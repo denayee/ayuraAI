@@ -15,7 +15,6 @@ from routes.ai_implement import generate_recommendation
 from routes.ML_prediction import get_ml_predictions
 from routes.product_search import (
     generate_search_query,
-    search_products_by_store,
     search_all_stores,
 )
 
@@ -120,10 +119,19 @@ def recommendation():
 
             # Save to Cache
             try:
+                cache_data = {}
+                if os.path.exists(cache_file):
+                    try:
+                        with open(cache_file, "r") as f:
+                            cache_data = json.load(f)
+                    except Exception:
+                        pass
+                
+                cache_data["user_id"] = user_id
+                cache_data["AI_generated_json_file"] = ai_output
+                
                 with open(cache_file, "w") as f:
-                    json.dump(
-                        {"user_id": user_id, "AI_generated_json_file": ai_output}, f
-                    )
+                    json.dump(cache_data, f)
             except Exception as e:
                 print(f"Error saving cache file: {e}")
 
@@ -210,10 +218,39 @@ def fetch_products():
         if custom_query:
             search_query = custom_query
         else:
-            search_query = generate_search_query(user_profile)
+            # Check if query is already cached for user
+            user_cache_dir = "AI_generated_json_file"
+            user_cache_file = os.path.join(user_cache_dir, f"{user_id}.json")
+            cache_data = {}
+            search_query = None
+            
+            if os.path.exists(user_cache_file):
+                try:
+                    with open(user_cache_file, "r") as f:
+                        cache_data = json.load(f)
+                        search_query = cache_data.get("search_query")
+                except Exception as e:
+                    print(f"Error reading AI cache: {e}")
+                    
+            if not search_query:
+                # Generate brand new query from Gemini
+                search_query = generate_search_query(user_profile)
+                
+                # Append to the user's loaded cache file
+                cache_data["user_id"] = user_id
+                cache_data["search_query"] = search_query
+                
+                if not os.path.exists(user_cache_dir):
+                    os.makedirs(user_cache_dir)
+                    
+                try:
+                    with open(user_cache_file, "w") as f:
+                        json.dump(cache_data, f)
+                except Exception as e:
+                    print(f"Error saving AI cache: {e}")
 
         # Search ALL stores and get top-rated products with pagination
-        result = search_all_stores(search_query, min_rating, limit_per_store, offset)
+        result = search_all_stores(search_query, min_rating, limit_per_store, offset, global_timeout=None, user_id=str(user_id))
         all_products = result["products"]
         by_store = result["by_store"]
         has_more = result["has_more"]

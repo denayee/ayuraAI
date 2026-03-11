@@ -17,45 +17,45 @@ document.addEventListener('DOMContentLoaded', function() {
     let allProducts = [];
     let productsByStore = {"amazon": [], "flipkart": [], "nykaa": []};
     let currentFilter = "all";
-    let currentOffset = 0;
     let currentQuery = "";
-    let hasMore = false;
+    let currentOffset = 0;
     let isLoading = false;
+    let hasMore = true;
     let isExhausted = false;
+    let hasError = false;
 
     // Auto-fetch on page load
     function autoSearchProducts() {
-        currentOffset = 0;
         allProducts = [];
         productsByStore = {"amazon": [], "flipkart": [], "nykaa": []};
-        hasMore = false;
-        isExhausted = false;
+        currentOffset = 0;
         isLoading = false;
+        hasMore = true;
+        isExhausted = false;
+        hasError = false;
         fetchTopRatedProducts();
     }
 
     // Fetch top-rated products from all stores
     function fetchTopRatedProducts() {
         if (isLoading) return;
-        
+
         isLoading = true;
-        
+        hasError = false;
+
+        // Reset UI for load
+        showElement(productsLoading);
         if (currentOffset === 0) {
-            // First load
-            showElement(productsLoading);
             hideElement(productsEmpty);
             hideElement(searchQueryDisplay);
-            hideElement(loadMoreContainer);
-            hideElement(noMoreContainer);
             productsGrid.innerHTML = '';
-        } else {
-            // Load more
-            showElement(productsLoading);
         }
+        hideElement(loadMoreContainer);
+        hideElement(noMoreContainer);
 
         // Send request to backend with timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 65000); // 65 second timeout (matches backend)
 
         fetch('/routes/api/fetch-products', {
             method: 'POST',
@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 min_rating: 4.0,
-                limit_per_store: 6,
                 offset: currentOffset
             }),
             signal: controller.signal
@@ -77,86 +76,91 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (data.success && data.products && data.products.length > 0) {
                 if (currentOffset === 0) {
-                    // First load - reset everything
                     allProducts = data.products;
                     productsByStore = data.by_store || {"amazon": [], "flipkart": [], "nykaa": []};
-                    currentQuery = data.query;
                     productsGrid.innerHTML = '';
                 } else {
-                    // Load more - append to existing
-                    allProducts = allProducts.concat(data.products);
+                    const existingIds = new Set(allProducts.map(p => p.link));
+                    const newProducts = data.products.filter(p => !existingIds.has(p.link));
+                    allProducts = allProducts.concat(newProducts);
                 }
-                
-                hasMore = data.has_more || false;
-                isExhausted = data.is_exhausted || false;
-                
-                // Update tab counts only on first load
-                if (currentOffset === 0) {
-                    updateTabCounts(data);
-                    
-                    // Display generated query
-                    generatedQuery.textContent = data.query;
-                    showElement(searchQueryDisplay);
-                }
+
+                currentQuery = data.query;
+                hasMore = data.has_more;
+                isExhausted = data.is_exhausted;
+
+                // Update tab counts
+                updateTabCounts(data);
+
+                // Display generated query
+                generatedQuery.textContent = data.query;
+                showElement(searchQueryDisplay);
 
                 // Display products for current filter
                 displayProductsByFilter(currentFilter);
-                
-                // Update Load More button visibility
                 updateLoadMoreVisibility();
             } else if (currentOffset === 0) {
-                // No products on first load
+                // No products strictly on first load
                 showElement(productsEmpty);
-                hideElement(loadMoreContainer);
-                hideElement(noMoreContainer);
+                const emptyMsg = productsEmpty.querySelector('p');
+                if (emptyMsg) {
+                    emptyMsg.textContent = 'No top-rated products found for this profile. Try adjusting your settings.';
+                }
                 hasMore = false;
                 isExhausted = true;
+                hideElement(productsLoading);
+                updateLoadMoreVisibility();
             } else {
-                // No more products on load more - mark as exhausted
-                hideElement(loadMoreContainer);
-                showElement(noMoreContainer);
+                // Exhausted subsequent load
                 hasMore = false;
                 isExhausted = true;
+                hideElement(productsLoading);
+                updateLoadMoreVisibility();
             }
         })
         .catch(error => {
             clearTimeout(timeoutId);
             console.error('Error fetching products:', error);
             isLoading = false;
-            hideElement(productsLoading);
-            
+            hideElement(productsLoading); // Ensure loading is hidden on error
+            hasError = true;
+
             // Check if it was a timeout error
             if (error.name === 'AbortError') {
-                console.error('Request timed out after 30 seconds');
+                console.error('Request timed out');
             }
-            
-            // On error: mark as exhausted to prevent infinite retries
-            hasMore = false;
-            isExhausted = true;
-            
-            if (currentOffset === 0) {
-                // Show empty message on first load timeout
-                const emptyMsg = productsEmpty.querySelector('p') || productsEmpty;
-                if (emptyMsg.textContent) {
-                    emptyMsg.textContent = 'Unable to load products. Please try again later.';
+
+            // Show retry button instead of giving up
+            if (allProducts.length === 0) {
+                // No products loaded yet - show retry button
+                const emptyMsg = productsEmpty.querySelector('p');
+                if (emptyMsg) {
+                    emptyMsg.textContent = '⏱️ Request timed out. Click below to retry.';
                 }
                 showElement(productsEmpty);
-                hideElement(loadMoreContainer);
-            } else {
-                // Show timeout message on load more
-                hideElement(loadMoreContainer);
-                showElement(noMoreContainer);
-                const noMoreMsg = noMoreContainer.querySelector('p');
-                if (noMoreMsg) {
-                    noMoreMsg.textContent = '⏱️ Loading took too long. Please try again.';
-                }
+                
+                // Keep the button available for Retry
+                const btnText = loadMoreBtn.querySelector('.load-more-text') || loadMoreBtn;
+                btnText.textContent = '🔄 Try Again';
+                showElement(loadMoreContainer);
             }
         });
     }
 
     // Update Load More button visibility based on state
     function updateLoadMoreVisibility() {
-        if (hasMore && !isExhausted && !isLoading) {
+        const btnText = loadMoreBtn.querySelector('.load-more-text');
+        if (btnText) {
+            btnText.textContent = '📦 Load More Products';
+        }
+
+        if (isLoading) {
+            hideElement(loadMoreContainer);
+            hideElement(noMoreContainer);
+            return;
+        }
+
+        if (hasMore && !isExhausted) {
             showElement(loadMoreContainer);
             hideElement(noMoreContainer);
         } else if (isExhausted || !hasMore) {
@@ -170,33 +174,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load more products
     function loadMoreProducts() {
-        // Safety checks: prevent loading if already loading, no more products, or exhausted
-        if (isLoading) {
-            console.warn('Already loading products');
-            return;
-        }
-        if (isExhausted) {
-            console.warn('Products exhausted');
-            updateLoadMoreVisibility();
-            return;
-        }
-        if (!hasMore) {
-            console.warn('No more products available');
-            isExhausted = true;
-            updateLoadMoreVisibility();
-            return;
-        }
+        if (isLoading) return;
         
-        // Safety: prevent excessive pagination attempts
-        const MAX_SAFE_OFFSET = 50;
-        if (currentOffset >= MAX_SAFE_OFFSET) {
-            console.warn('Maximum pagination limit reached');
-            isExhausted = true;
-            updateLoadMoreVisibility();
-            return;
+        if (!hasError) {
+            currentOffset += 1;
         }
-        
-        currentOffset += 1;
+
         console.log('Loading more products at offset:', currentOffset);
         fetchTopRatedProducts();
     }
@@ -207,6 +190,31 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('amazon-count').textContent = data.amazon_count || 0;
         document.getElementById('flipkart-count').textContent = data.flipkart_count || 0;
         document.getElementById('nykaa-count').textContent = data.nykaa_count || 0;
+        
+        // Hide tabs that returned exactly 0 products
+        storeTabs.forEach(tab => {
+            const tabStore = tab.getAttribute('data-store');
+            
+            if (tabStore === 'amazon' && (!data.amazon_count || data.amazon_count === 0)) {
+                hideElement(tab);
+            } else if (tabStore === 'flipkart' && (!data.flipkart_count || data.flipkart_count === 0)) {
+                hideElement(tab);
+            } else if (tabStore === 'nykaa' && (!data.nykaa_count || data.nykaa_count === 0)) {
+                hideElement(tab);
+            } else {
+                showElement(tab);
+            }
+        });
+        
+        // If the current tab went empty, default back to 'all'
+        const activeTab = Array.from(storeTabs).find(tab => tab.classList.contains('active'));
+        if (activeTab && activeTab.classList.contains('hidden-element')) {
+            // Find the 'All' tab and click it to reset the view gracefully
+            const allTab = Array.from(storeTabs).find(tab => tab.getAttribute('data-store') === 'all');
+            if (allTab) {
+                allTab.click();
+            }
+        }
     }
 
     // Display products filtered by store
@@ -221,15 +229,19 @@ document.addEventListener('DOMContentLoaded', function() {
             productsToDisplay = allProducts.filter(p => p.store === filter);
         }
 
-        if (productsToDisplay.length === 0 && currentOffset === 0) {
-            showElement(productsEmpty);
-            hideElement(loadMoreContainer);
+        if (productsToDisplay.length === 0) {
+            const emptyMsg = productsEmpty.querySelector('p');
+            if (emptyMsg) {
+                emptyMsg.textContent = `No ${filter !== 'all' ? filter : ''} products found.`;
+            }
+            hideElement(productsLoading); // Guarantee spinner is hidden if empty
             return;
+        } else {
+            hideElement(productsEmpty);
         }
 
         // Add products to grid
         if (currentOffset === 0 || currentFilter !== filter) {
-            // First load or filter changed
             productsGrid.innerHTML = '';
         }
         
@@ -329,14 +341,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add active class to clicked tab
             this.classList.add('active');
             
-            // Update filter and display (don't need to load again, just filter)
             currentFilter = this.getAttribute('data-store');
             productsGrid.innerHTML = ''; // Clear grid
             displayProductsByFilter(currentFilter);
+            updateLoadMoreVisibility();
         });
     });
 
-    // Load More button handler
+    // Load More button handler is now back to pagination!
     if (loadMoreBtn) {
         loadMoreBtn.addEventListener('click', loadMoreProducts);
     }
