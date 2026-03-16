@@ -1,0 +1,86 @@
+{% extends 'home.html' %}
+
+{% block page_top_background %}
+    <div class="page-top-vanta" aria-hidden="true">
+        <div id="vanta-poster"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <script src="{{ url_for('static', filename='js/vanta-bg.js') }}" defer></script>
+{% endblock page_top_background %}
+
+{% block home %}
+<section class="hero" style="min-height: 60vh;">
+    <div class="hero-content">
+        <h2>About <span>AyuraAI</span></h2>
+        <p>
+            Revolutionizing personalized wellness through the synergy of ancient wisdom and modern artificial intelligence.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <h2>Our Mission</h2>
+        <p>To empower every individual with scientifically-backed, personalized skincare and haircare routines that prioritize safety, efficacy, and natural wellbeing.</p>
+    </div>
+</section>
+
+<section class="section section-alt">
+    <div class="section-header">
+        <h2>Why AyuraAI?</h2>
+        <p>We combine advanced diagnostics with a deep understanding of natural remedies to provide a holistic approach to beauty.</p>
+    </div>
+    
+    <div class="stacked-cards-container">
+        <div class="stacked-card">
+            <div class="icon">🔍</div>
+            <div class="stacked-content">
+                <h3>Scientific Precision</h3>
+                <p>Our AI models are trained on extensive dermatological data to ensure every recommendation is tailored to your unique skin and hair profile.</p>
+            </div>
+        </div>
+
+        <div class="stacked-card">
+            <div class="icon">🌿</div>
+            <div class="stacked-content">
+                <h3>Nature First</h3>
+                <p>We believe in the power of nature. Our system prioritizes non-toxic ingredients and provides custom home remedies for a chemical-free lifestyle.</p>
+            </div>
+        </div>
+
+        <div class="stacked-card">
+            <div class="icon">🛡️</div>
+            <div class="stacked-content">
+                <h3>Allergy Aware</h3>
+                <p>Safety is our top priority. We cross-reference every recommendation against your personal allergy profile to keep your skin protected.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header" style="margin-bottom: 30px;">
+        <h2>The Story Behind AyuraAI</h2>
+    </div>
+    <div style="max-width: 800px; margin: 0 auto; color: var(--text-secondary); line-height: 1.8; text-align: center;">
+        <p style="margin-bottom: 20px;">
+            AyuraAI was born from a simple yet powerful idea: beauty care should be as unique as the person receiving it. In a world full of generic products and one-size-fits-all solutions, we saw a need for a smarter, more personal approach.
+        </p>
+        <p>
+            By leveraging cutting-edge AI technology, we've created a platform that doesn't just suggest products, but understands your body's specific needs. Whether it's finding the perfect serum or crafting a DIY mask from ingredients in your kitchen, AyuraAI is your personal wellness companion.
+        </p>
+    </div>
+</section>
+
+<section class="contact-section">
+    <div class="contact-container" style="text-align: center;">
+        <h2 class="contact-heading">Join Our Journey</h2>
+        <p class="contact-subtitle">Experience the future of personalized care today.</p>
+        <br>
+        <a href="{{ url_for('register.register') }}" class="btn-primary">Start Your Free Profile ✨</a>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/landing.js') }}" defer></script>
+{% endblock home %}

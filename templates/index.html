@@ -1,16 +1,18 @@
 {% extends 'home.html' %}
+
+{% block page_top_background %}
+    <div class="page-top-vanta" aria-hidden="true">
+        <div id="vanta-poster"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <script src="{{ url_for('static', filename='js/vanta-bg.js') }}" defer></script>
+{% endblock page_top_background %}
+
 {% block home %}
 
     <!-- Hero Section -->
     <section class="hero">
-        <!-- Premium Live Image Slider -->
-        
-                    <div id="vanta-poster"></div>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
-                    <script src="{{ url_for('static', filename='js/vanta-bg.js') }}" defer></script>
-       
-
         <!-- Left Aligned Hero Box -->
         <div class="hero-content">
             <h2>Personalized <span>Skin & Hair</span> Care Analysis</h2>

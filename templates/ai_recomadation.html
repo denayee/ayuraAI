@@ -1,5 +1,8 @@
 {% extends 'home.html' %}
 
+{% block nav_links %}<a href="#products-section">Products</a>{% endblock %}
+{% block mobile_nav_links %}<a href="#products-section" class="mobile-nav-link">Products</a>{% endblock %}
+
 {% block home %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/ai_recomodation.css') }}">
 
@@ -90,7 +93,7 @@
         </div> <!-- end recommendation-grid -->
 
         <!-- Products Section -->
-        <div class="products-section">
+        <div class="products-section" id="products-section">
             <div class="products-header">
                 <h2>🛍️ Top Rated Products From All Stores</h2>
                 <p class="products-subtitle">Only the highest-rated products across Amazon, Flipkart & Nykaa</p>

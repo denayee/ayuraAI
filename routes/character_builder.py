@@ -14,6 +14,10 @@ def character_builder():
     if "user_id" not in session:
         return redirect(url_for("login.login"))
 
+    # 🔐 User must click Edit Profile button to access this page
+    if not session.get("can_edit_profile"):
+        return redirect(url_for("account.account"))
+
     # Ensure gender and age are in session (may be missing for users logged in before this was added)
     if "gender" not in session or "age" not in session:
         db = get_db()
@@ -23,6 +27,61 @@ def character_builder():
         session["gender"] = row[0] if row and row[0] else "Not specified"
         session["age"] = row[1] if row and row[1] else 25
         db.close()
+
+    # Fetch existing profile data for editing (GET request)
+    existing_profile = None
+    if request.method == "GET":
+        user_id = session["user_id"]
+        db = get_db()
+        try:
+            cur = db.cursor()
+
+            # Get skin profile
+            cur.execute(
+                "SELECT * FROM skin_profile WHERE user_id = ? ORDER BY id DESC LIMIT 1",
+                (user_id,),
+            )
+            skin_row = cur.fetchone()
+
+            # Get hair profile
+            cur.execute(
+                "SELECT * FROM hair_profile WHERE user_id = ? ORDER BY id DESC LIMIT 1",
+                (user_id,),
+            )
+            hair_row = cur.fetchone()
+
+            # Get allergies
+            cur.execute(
+                "SELECT DISTINCT ingredient FROM allergies WHERE user_id = ?",
+                (user_id,),
+            )
+            allergies = [row[0] for row in cur.fetchall()]
+
+            if skin_row and hair_row:
+                existing_profile = {
+                    "skin_type": skin_row[3],
+                    "skin_color": skin_row[4],
+                    "skin_problems": skin_row[5].split(",") if skin_row[5] else [],
+                    "sensitivity_level": skin_row[6],
+                    "oil_level": skin_row[7],
+                    "acne_presence": skin_row[8],
+                    "acne_level": skin_row[9],
+                    "dryness_presence": skin_row[10],
+                    "dryness_level": skin_row[11],
+                    "lifestyle": skin_row[12],
+                    "hair_type": hair_row[3],
+                    "hair_color": hair_row[4],
+                    "hair_problems": hair_row[5].split(",") if hair_row[5] else [],
+                    "scalp_condition": hair_row[6],
+                    "hair_fall_level": hair_row[7],
+                    "hair_dryness_presence": hair_row[8],
+                    "hair_dryness_level": hair_row[9],
+                    "scalp_itch_presence": hair_row[10],
+                    "scalp_itch_level": hair_row[11],
+                    "allergies": allergies,
+                }
+        finally:
+            db.close()
 
     if request.method == "POST":
         user_id = session["user_id"]
@@ -169,7 +228,9 @@ def character_builder():
             except OSError as e:
                 print(f"Error removing cache file: {e}")
 
-        flash("Profile created successfully!", "success")
+        flash("Profile updated successfully!", "success")
+        # Reset the flag so user must click Edit Profile button again
+        session.pop("can_edit_profile", None)
         return redirect(url_for("recommendation.recommendation"))
 
-    return render_template("character_builder.html")
+    return render_template("character_builder.html", existing_profile=existing_profile)

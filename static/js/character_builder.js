@@ -2,7 +2,42 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial check
     handleSkinType();
     handleScalpCondition();
+
+    // Show conditional fields based on existing values (for edit mode)
+    initConditionalFields();
 });
+
+function initConditionalFields() {
+    // Acne level field - show if acne presence is Yes
+    const acnePresenceYes = document.querySelector('input[name="acne_presence"][value="Yes"]');
+    if (acnePresenceYes && acnePresenceYes.checked) {
+        toggleField('acne-level-group', true);
+    }
+
+    // Dryness level field - show if dryness presence is Yes
+    const drynessPresenceYes = document.querySelector('input[name="dryness_presence"][value="Yes"]');
+    if (drynessPresenceYes && drynessPresenceYes.checked) {
+        toggleField('dryness-level-group', true);
+    }
+
+    // Hair dryness level field - show if hair dryness presence is Yes
+    const hairDrynessPresenceYes = document.querySelector('input[name="hair_dryness_presence"][value="Yes"]');
+    if (hairDrynessPresenceYes && hairDrynessPresenceYes.checked) {
+        toggleField('hair-dryness-level-group', true);
+    }
+
+    // Scalp itch level field - show if scalp itch presence is Yes
+    const scalpItchPresenceYes = document.querySelector('input[name="scalp_itch_presence"][value="Yes"]');
+    if (scalpItchPresenceYes && scalpItchPresenceYes.checked) {
+        toggleField('scalp-itch-level-group', true);
+    }
+
+    // Oil level field - show if skin type is Oily
+    const skinTypeSelect = document.querySelector('select[name="skin_type"]');
+    if (skinTypeSelect && skinTypeSelect.value === 'Oily') {
+        toggleField('skin-oil-group', true);
+    }
+}
 
 function toggleField(elementId, show) {
     const el = document.getElementById(elementId);

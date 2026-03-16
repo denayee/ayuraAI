@@ -8,13 +8,16 @@ from routes.ai_implement import ai_implement
 from routes.ML_prediction import prediction_bp
 from routes.account import account_bp
 from routes.product_search import product_search_bp
+from routes.chatbot import chatbot_bp
 from dotenv import load_dotenv
-import os
-
+import secrets
 
 app = Flask(__name__)
 load_dotenv()
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "ayura-ai-secret-key-change-me")
+
+
+# Generate a random SECRET_KEY every time the server starts
+app.config["SECRET_KEY"] = secrets.token_urlsafe(32)
 
 # Initialize Google OAuth
 init_google_oauth(app)
@@ -35,6 +38,11 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
 # Register Blueprints
 app.register_blueprint(register_bp, url_prefix="/auth")
 app.register_blueprint(login_bp, url_prefix="/auth")
@@ -45,6 +53,7 @@ app.register_blueprint(ai_implement, url_prefix="/routes")
 app.register_blueprint(prediction_bp)
 app.register_blueprint(account_bp, url_prefix="/routes")
 app.register_blueprint(product_search_bp, url_prefix="/api")
+app.register_blueprint(chatbot_bp, url_prefix="/api")
 
 
 if __name__ == "__main__":

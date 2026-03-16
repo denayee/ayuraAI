@@ -5,8 +5,8 @@
 
 <div class="builder-container">
     <div class="builder-card">
-        <h2 class="builder-title">Welcome, {{ session.get('name', 'User') }}! <br>Create Your Avatar</h2>
-        <p class="builder-subtitle">Define your unique skin & hair profile for personalized AI care.</p>
+        <h2 class="builder-title">Welcome, {{ session.get('name', 'User') }}! <br>{% if existing_profile %}Edit Your Avatar{% else %}Create Your Avatar{% endif %}</h2>
+        <p class="builder-subtitle">{% if existing_profile %}Update your skin & hair profile for personalized AI care.{% else %}Define your unique skin & hair profile for personalized AI care.{% endif %}</p>
 
         <div class="builder-layout-split">
             <!-- LEFT COLUMN: FORM -->
@@ -29,18 +29,18 @@
                 <div class="form-group">
                     <label>Skin Type</label>
                     <select name="skin_type" required onchange="handleSkinType()">
-                        <option value="" disabled selected>Select Type</option>
-                        <option value="Oily">Oily</option>
-                        <option value="Dry">Dry</option>
-                        <option value="Combination">Combination</option>
-                        <option value="Normal">Normal</option>
-                        <option value="Sensitive">Sensitive</option>
+                        <option value="" disabled {% if not existing_profile %}selected{% endif %}>Select Type</option>
+                        <option value="Oily" {% if existing_profile and existing_profile.skin_type == 'Oily' %}selected{% endif %}>Oily</option>
+                        <option value="Dry" {% if existing_profile and existing_profile.skin_type == 'Dry' %}selected{% endif %}>Dry</option>
+                        <option value="Combination" {% if existing_profile and existing_profile.skin_type == 'Combination' %}selected{% endif %}>Combination</option>
+                        <option value="Normal" {% if existing_profile and existing_profile.skin_type == 'Normal' %}selected{% endif %}>Normal</option>
+                        <option value="Sensitive" {% if existing_profile and existing_profile.skin_type == 'Sensitive' %}selected{% endif %}>Sensitive</option>
                     </select>
                 </div>
 
                 <div class="form-group hidden" id="skin-oil-group">
                     <label>Skin Oil Level</label>
-                    <input type="range" name="oil_level" min="1" max="3" step="1" list="level-markers-3">
+                    <input type="range" name="oil_level" min="1" max="3" step="1" list="level-markers-3" {% if existing_profile and existing_profile.oil_level %}value="{% if existing_profile.oil_level == 'Low' %}1{% elif existing_profile.oil_level == 'Medium' %}2{% else %}3{% endif %}"{% endif %}>
                     <div class="range-labels">
                         <span>Low</span>
                         <span>High</span>
@@ -51,19 +51,19 @@
                     <label>Skin Color</label>
                     <div class="color-options">
                         <label class="color-option" style="background-color: #F8D9C6;">
-                            <input type="radio" name="skin_color" value="Fair" required>
+                            <input type="radio" name="skin_color" value="Fair" required {% if existing_profile and existing_profile.skin_color == 'Fair' %}checked{% endif %}>
                         </label>
                         <label class="color-option" style="background-color: #E0AC84;">
-                            <input type="radio" name="skin_color" value="Medium">
+                            <input type="radio" name="skin_color" value="Medium" {% if existing_profile and existing_profile.skin_color == 'Medium' %}checked{% endif %}>
                         </label>
                         <label class="color-option" style="background-color: #C68642;">
-                            <input type="radio" name="skin_color" value="Olive">
+                            <input type="radio" name="skin_color" value="Olive" {% if existing_profile and existing_profile.skin_color == 'Olive' %}checked{% endif %}>
                         </label>
                         <label class="color-option" style="background-color: #8D5524;">
-                            <input type="radio" name="skin_color" value="Brown">
+                            <input type="radio" name="skin_color" value="Brown" {% if existing_profile and existing_profile.skin_color == 'Brown' %}checked{% endif %}>
                         </label>
                         <label class="color-option" style="background-color: #3B2219;">
-                            <input type="radio" name="skin_color" value="Dark">
+                            <input type="radio" name="skin_color" value="Dark" {% if existing_profile and existing_profile.skin_color == 'Dark' %}checked{% endif %}>
                         </label>
                     </div>
                 </div>
@@ -71,11 +71,11 @@
                 <div class="form-group full">
                     <label>Concern Areas</label>
                     <div class="checkbox-group">
-                        <label><input type="checkbox" name="skin_problems" value="Acne"> Acne</label>
-                        <label><input type="checkbox" name="skin_problems" value="Pigmentation"> Pigmentation</label>
-                        <label><input type="checkbox" name="skin_problems" value="Dark Circles"> Dark Circles</label>
-                        <label><input type="checkbox" name="skin_problems" value="Wrinkles"> Wrinkles</label>
-                        <label><input type="checkbox" name="skin_problems" value="Redness"> Redness</label>
+                        <label><input type="checkbox" name="skin_problems" value="Acne" {% if existing_profile and 'Acne' in existing_profile.skin_problems %}checked{% endif %}> Acne</label>
+                        <label><input type="checkbox" name="skin_problems" value="Pigmentation" {% if existing_profile and 'Pigmentation' in existing_profile.skin_problems %}checked{% endif %}> Pigmentation</label>
+                        <label><input type="checkbox" name="skin_problems" value="Dark Circles" {% if existing_profile and 'Dark Circles' in existing_profile.skin_problems %}checked{% endif %}> Dark Circles</label>
+                        <label><input type="checkbox" name="skin_problems" value="Wrinkles" {% if existing_profile and 'Wrinkles' in existing_profile.skin_problems %}checked{% endif %}> Wrinkles</label>
+                        <label><input type="checkbox" name="skin_problems" value="Redness" {% if existing_profile and 'Redness' in existing_profile.skin_problems %}checked{% endif %}> Redness</label>
                     </div>
                 </div>
                 
@@ -83,13 +83,13 @@
                  <div class="form-group">
                     <label>Acne Presence</label>
                     <div class="radio-group-inline">
-                        <label><input type="radio" name="acne_presence" value="Yes" onchange="toggleField('acne-level-group', true)"> Yes</label>
-                        <label><input type="radio" name="acne_presence" value="No" onchange="toggleField('acne-level-group', false)" checked> No</label>
+                        <label><input type="radio" name="acne_presence" value="Yes" onchange="toggleField('acne-level-group', true)" {% if existing_profile and existing_profile.acne_presence == 'Yes' %}checked{% endif %}> Yes</label>
+                        <label><input type="radio" name="acne_presence" value="No" onchange="toggleField('acne-level-group', false)" {% if not existing_profile or existing_profile.acne_presence != 'Yes' %}checked{% endif %}> No</label>
                     </div>
                 </div>
                 <div class="form-group hidden" id="acne-level-group">
                     <label>Acne Level</label>
-                    <input type="range" name="acne_level" min="1" max="3" step="1" list="level-markers-3">
+                    <input type="range" name="acne_level" min="1" max="3" step="1" list="level-markers-3" {% if existing_profile and existing_profile.acne_level %}value="{% if existing_profile.acne_level == 'Mild' %}1{% elif existing_profile.acne_level == 'Moderate' %}2{% else %}3{% endif %}"{% endif %}>
                     <div class="range-labels">
                         <span>Mild</span>
                         <span>Severe</span>
@@ -99,13 +99,13 @@
                  <div class="form-group" id="skin-dryness-wrapper">
                     <label>Skin Dryness</label>
                      <div class="radio-group-inline">
-                        <label><input type="radio" name="dryness_presence" value="Yes" onchange="toggleField('dryness-level-group', true)"> Yes</label>
-                        <label><input type="radio" name="dryness_presence" value="No" onchange="toggleField('dryness-level-group', false)" checked> No</label>
+                        <label><input type="radio" name="dryness_presence" value="Yes" onchange="toggleField('dryness-level-group', true)" {% if existing_profile and existing_profile.dryness_presence == 'Yes' %}checked{% endif %}> Yes</label>
+                        <label><input type="radio" name="dryness_presence" value="No" onchange="toggleField('dryness-level-group', false)" {% if not existing_profile or existing_profile.dryness_presence != 'Yes' %}checked{% endif %}> No</label>
                     </div>
                 </div>
                  <div class="form-group hidden" id="dryness-level-group">
                     <label>Dryness Level</label>
-                    <input type="range" name="dryness_level" min="1" max="3" step="1" list="level-markers-3">
+                    <input type="range" name="dryness_level" min="1" max="3" step="1" list="level-markers-3" {% if existing_profile and existing_profile.dryness_level %}value="{% if existing_profile.dryness_level == 'Mild' %}1{% elif existing_profile.dryness_level == 'Moderate' %}2{% else %}3{% endif %}"{% endif %}>
                     <div class="range-labels">
                         <span>Mild</span>
                         <span>Severe</span>
@@ -115,7 +115,7 @@
 
                 <div class="form-group">
                     <label>Sensitivity Level</label>
-                    <input type="range" name="sensitivity_level" min="0" max="3" step="1" list="sensitivity-markers">
+                    <input type="range" name="sensitivity_level" min="0" max="3" step="1" list="sensitivity-markers" value="{{ existing_profile.sensitivity_level|default('0') }}">
                     <datalist id="sensitivity-markers">
                         <option value="0" label="None"></option>
                         <option value="1" label="Low"></option>
@@ -150,11 +150,11 @@
                 <div class="form-group">
                     <label>Hair Type</label>
                     <select name="hair_type" required>
-                        <option value="" disabled selected>Select Type</option>
-                        <option value="Straight">Straight</option>
-                        <option value="Wavy">Wavy</option>
-                        <option value="Curly">Curly</option>
-                        <option value="Coily">Coily</option>
+                        <option value="" disabled {% if not existing_profile %}selected{% endif %}>Select Type</option>
+                        <option value="Straight" {% if existing_profile and existing_profile.hair_type == 'Straight' %}selected{% endif %}>Straight</option>
+                        <option value="Wavy" {% if existing_profile and existing_profile.hair_type == 'Wavy' %}selected{% endif %}>Wavy</option>
+                        <option value="Curly" {% if existing_profile and existing_profile.hair_type == 'Curly' %}selected{% endif %}>Curly</option>
+                        <option value="Coily" {% if existing_profile and existing_profile.hair_type == 'Coily' %}selected{% endif %}>Coily</option>
                     </select>
                 </div>
 
@@ -162,22 +162,22 @@
                     <label>Hair Color</label>
                     <div class="color-options">
                         <label class="color-option" style="background-color: #090806;">
-                            <input type="radio" name="hair_color" value="Black" required>
+                            <input type="radio" name="hair_color" value="Black" required {% if existing_profile and existing_profile.hair_color == 'Black' %}checked{% endif %}>
                         </label>
                         <label class="color-option" style="background-color: #3B3024;">
-                            <input type="radio" name="hair_color" value="Dark Brown">
+                            <input type="radio" name="hair_color" value="Dark Brown" {% if existing_profile and existing_profile.hair_color == 'Dark Brown' %}checked{% endif %}>
                         </label>
                         <label class="color-option" style="background-color: #B55239;">
-                            <input type="radio" name="hair_color" value="Red">
+                            <input type="radio" name="hair_color" value="Red" {% if existing_profile and existing_profile.hair_color == 'Red' %}checked{% endif %}>
                         </label>
                         <label class="color-option" style="background-color: #E6CEA8;">
-                            <input type="radio" name="hair_color" value="Blonde">
+                            <input type="radio" name="hair_color" value="Blonde" {% if existing_profile and existing_profile.hair_color == 'Blonde' %}checked{% endif %}>
                         </label>
                         <label class="color-option" style="background-color: #A7856A;">
-                            <input type="radio" name="hair_color" value="Light Brown">
+                            <input type="radio" name="hair_color" value="Light Brown" {% if existing_profile and existing_profile.hair_color == 'Light Brown' %}checked{% endif %}>
                         </label>
                          <label class="color-option" style="background-color: #E5E5E5;">
-                            <input type="radio" name="hair_color" value="Grey/White">
+                            <input type="radio" name="hair_color" value="Grey/White" {% if existing_profile and existing_profile.hair_color == 'Grey/White' %}checked{% endif %}>
                         </label>
                     </div>
                 </div>
@@ -185,17 +185,17 @@
                 <div class="form-group full">
                     <label>Hair Concerns</label>
                     <div class="checkbox-group">
-                        <label><input type="checkbox" name="hair_problems" value="Hairfall"> Hairfall</label>
-                        <label><input type="checkbox" name="hair_problems" value="Dandruff"> Dandruff</label>
-                        <label><input type="checkbox" name="hair_problems" value="Split Ends"> Split Ends</label>
-                        <label><input type="checkbox" name="hair_problems" value="Frizzy"> Frizzy</label>
-                        <label><input type="checkbox" name="hair_problems" value="Breatkage"> Breakage</label>
+                        <label><input type="checkbox" name="hair_problems" value="Hairfall" {% if existing_profile and 'Hairfall' in existing_profile.hair_problems %}checked{% endif %}> Hairfall</label>
+                        <label><input type="checkbox" name="hair_problems" value="Dandruff" {% if existing_profile and 'Dandruff' in existing_profile.hair_problems %}checked{% endif %}> Dandruff</label>
+                        <label><input type="checkbox" name="hair_problems" value="Split Ends" {% if existing_profile and 'Split Ends' in existing_profile.hair_problems %}checked{% endif %}> Split Ends</label>
+                        <label><input type="checkbox" name="hair_problems" value="Frizzy" {% if existing_profile and 'Frizzy' in existing_profile.hair_problems %}checked{% endif %}> Frizzy</label>
+                        <label><input type="checkbox" name="hair_problems" value="Breakage" {% if existing_profile and 'Breakage' in existing_profile.hair_problems %}checked{% endif %}> Breakage</label>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>Hair Fall Level</label>
-                    <input type="range" name="hair_fall_level" min="1" max="3" step="1" list="level-markers-3">
+                    <input type="range" name="hair_fall_level" min="1" max="3" step="1" list="level-markers-3" {% if existing_profile and existing_profile.hair_fall_level %}value="{% if existing_profile.hair_fall_level == 'Low' %}1{% elif existing_profile.hair_fall_level == 'Medium' %}2{% else %}3{% endif %}"{% endif %}>
                     <div class="range-labels">
                         <span>Low</span>
                         <span>High</span>
@@ -207,13 +207,13 @@
                  <div class="form-group">
                     <label>Hair/Scalp Dryness</label>
                      <div class="radio-group-inline">
-                        <label><input type="radio" name="hair_dryness_presence" value="Yes" onchange="toggleField('hair-dryness-level-group', true)"> Yes</label>
-                        <label><input type="radio" name="hair_dryness_presence" value="No" onchange="toggleField('hair-dryness-level-group', false)" checked> No</label>
+                        <label><input type="radio" name="hair_dryness_presence" value="Yes" onchange="toggleField('hair-dryness-level-group', true)" {% if existing_profile and existing_profile.hair_dryness_presence == 'Yes' %}checked{% endif %}> Yes</label>
+                        <label><input type="radio" name="hair_dryness_presence" value="No" onchange="toggleField('hair-dryness-level-group', false)" {% if not existing_profile or existing_profile.hair_dryness_presence != 'Yes' %}checked{% endif %}> No</label>
                     </div>
                 </div>
                  <div class="form-group hidden" id="hair-dryness-level-group">
                     <label>Dryness Level</label>
-                    <input type="range" name="hair_dryness_level" min="1" max="3" step="1" list="level-markers-3">
+                    <input type="range" name="hair_dryness_level" min="1" max="3" step="1" list="level-markers-3" {% if existing_profile and existing_profile.hair_dryness_level %}value="{% if existing_profile.hair_dryness_level == 'Mild' %}1{% elif existing_profile.hair_dryness_level == 'Moderate' %}2{% else %}3{% endif %}"{% endif %}>
                     <div class="range-labels">
                         <span>Mild</span>
                         <span>Severe</span>
@@ -223,13 +223,13 @@
                  <div class="form-group">
                     <label>Scalp Itch</label>
                      <div class="radio-group-inline">
-                        <label><input type="radio" name="scalp_itch_presence" value="Yes" onchange="toggleField('scalp-itch-level-group', true)"> Yes</label>
-                        <label><input type="radio" name="scalp_itch_presence" value="No" onchange="toggleField('scalp-itch-level-group', false)" checked> No</label>
+                        <label><input type="radio" name="scalp_itch_presence" value="Yes" onchange="toggleField('scalp-itch-level-group', true)" {% if existing_profile and existing_profile.scalp_itch_presence == 'Yes' %}checked{% endif %}> Yes</label>
+                        <label><input type="radio" name="scalp_itch_presence" value="No" onchange="toggleField('scalp-itch-level-group', false)" {% if not existing_profile or existing_profile.scalp_itch_presence != 'Yes' %}checked{% endif %}> No</label>
                     </div>
                 </div>
                  <div class="form-group hidden" id="scalp-itch-level-group">
                     <label>Itch Level</label>
-                    <input type="range" name="scalp_itch_level" min="1" max="3" step="1" list="level-markers-3">
+                    <input type="range" name="scalp_itch_level" min="1" max="3" step="1" list="level-markers-3" {% if existing_profile and existing_profile.scalp_itch_level %}value="{% if existing_profile.scalp_itch_level == 'Mild' %}1{% elif existing_profile.scalp_itch_level == 'Moderate' %}2{% else %}3{% endif %}"{% endif %}>
                     <div class="range-labels">
                         <span>Mild</span>
                         <span>Severe</span>
@@ -240,11 +240,11 @@
                   <div class="form-group">
                     <label>Scalp Condition</label>
                     <select name="scalp_condition" required onchange="handleScalpCondition()">
-                         <option value="" disabled selected>Select Condition</option>
-                        <option value="Oily">Oily</option>
-                        <option value="Dry">Dry</option>
-                        <option value="Normal">Normal</option>
-                        <option value="Flaky">Flaky</option>
+                         <option value="" disabled {% if not existing_profile %}selected{% endif %}>Select Condition</option>
+                        <option value="Oily" {% if existing_profile and existing_profile.scalp_condition == 'Oily' %}selected{% endif %}>Oily</option>
+                        <option value="Dry" {% if existing_profile and existing_profile.scalp_condition == 'Dry' %}selected{% endif %}>Dry</option>
+                        <option value="Normal" {% if existing_profile and existing_profile.scalp_condition == 'Normal' %}selected{% endif %}>Normal</option>
+                        <option value="Flaky" {% if existing_profile and existing_profile.scalp_condition == 'Flaky' %}selected{% endif %}>Flaky</option>
                     </select>
                 </div>
 
@@ -254,8 +254,8 @@
              <div class="form-group">
                 <label>Primary Environment</label>
                  <div class="radio-group-inline">
-                    <label><input type="radio" name="lifestyle" value="Indoor" onchange="toggleField('environment-group', true)"> Indoor</label>
-                    <label><input type="radio" name="lifestyle" value="Outdoor" onchange="toggleField('environment-group', false)" checked> Outdoor</label>
+                    <label><input type="radio" name="lifestyle" value="Indoor" onchange="toggleField('environment-group', true)" {% if existing_profile and existing_profile.lifestyle == 'Indoor' %}checked{% endif %}> Indoor</label>
+                    <label><input type="radio" name="lifestyle" value="Outdoor" onchange="toggleField('environment-group', false)" {% if not existing_profile or existing_profile.lifestyle == 'Outdoor' %}checked{% endif %}> Outdoor</label>
                 </div>
             </div>
 
@@ -282,20 +282,20 @@
             <div class="form-group full">
                 <label>Do you have any known allergies?</label>
                 <div class="checkbox-group wide">
-                    <label><input type="checkbox" name="allergies" value="Peanuts"> Peanuts</label>
-                    <label><input type="checkbox" name="allergies" value="Dairy"> Dairy</label>
-                    <label><input type="checkbox" name="allergies" value="Gluten"> Gluten</label>
-                    <label><input type="checkbox" name="allergies" value="Latex"> Latex</label>
-                    <label><input type="checkbox" name="allergies" value="Fragrance"> Fragrance</label>
-                     <label><input type="checkbox" name="allergies" value="Aloe Vera"> Aloe Vera</label>
-                    <label><input type="checkbox" name="allergies" value="Coconut"> Coconut</label>
-                 <label><input type="checkbox" name="allergies" value="Sulphates"> Sulphates</label>
+                    <label><input type="checkbox" name="allergies" value="Peanuts" {% if existing_profile and 'Peanuts' in existing_profile.allergies %}checked{% endif %}> Peanuts</label>
+                    <label><input type="checkbox" name="allergies" value="Dairy" {% if existing_profile and 'Dairy' in existing_profile.allergies %}checked{% endif %}> Dairy</label>
+                    <label><input type="checkbox" name="allergies" value="Gluten" {% if existing_profile and 'Gluten' in existing_profile.allergies %}checked{% endif %}> Gluten</label>
+                    <label><input type="checkbox" name="allergies" value="Latex" {% if existing_profile and 'Latex' in existing_profile.allergies %}checked{% endif %}> Latex</label>
+                    <label><input type="checkbox" name="allergies" value="Fragrance" {% if existing_profile and 'Fragrance' in existing_profile.allergies %}checked{% endif %}> Fragrance</label>
+                     <label><input type="checkbox" name="allergies" value="Aloe Vera" {% if existing_profile and 'Aloe Vera' in existing_profile.allergies %}checked{% endif %}> Aloe Vera</label>
+                    <label><input type="checkbox" name="allergies" value="Coconut" {% if existing_profile and 'Coconut' in existing_profile.allergies %}checked{% endif %}> Coconut</label>
+                 <label><input type="checkbox" name="allergies" value="Sulphates" {% if existing_profile and 'Sulphates' in existing_profile.allergies %}checked{% endif %}> Sulphates</label>
                 </div>
             </div>
 
                 <div class="step-buttons">
                     <button type="button" class="btn-back" onclick="showStep(2)">⬅ Back</button>
-                    <button type="submit" class="btn-create">✨ Generate My Profile</button>
+                    <button type="submit" class="btn-create">{% if existing_profile %}✨ Update My Profile{% else %}✨ Generate My Profile{% endif %}</button>
                 </div>
             </div> <!-- End Step 3 -->
         </form>
