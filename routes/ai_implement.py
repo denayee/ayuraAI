@@ -56,7 +56,13 @@ def generate_recommendation(user_profile):
 
         # Try models in order of preference
         # Using latest available models for better quality
-        models_to_try = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-3-flash-preview"]
+        models_to_try = [
+            "gemini-2.5-pro",
+            "gemini-2.5-flash",
+            "gemini-3-flash-preview",
+            "Gemini 2.5 Pro",
+            "Gemini 2 Flash",
+        ]
 
         for model_name in models_to_try:
             try:

@@ -20,7 +20,9 @@ def login():
         try:
             cur = db.cursor()
             # Select password hash along with id and name
-            cur.execute("SELECT id, name, password, gender FROM users WHERE email=?", (email,))
+            cur.execute(
+                "SELECT id, name, password, gender FROM users WHERE email=?", (email,)
+            )
             user = cur.fetchone()
 
             if user and check_password_hash(user[2], password):

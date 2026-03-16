@@ -26,7 +26,7 @@ def register():
         return redirect(url_for("recommendation.recommendation"))
     if request.method == "POST":
         is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
-        
+
         name = request.form["name"]
         username = request.form["username"]
         email = request.form["email"]
@@ -38,10 +38,14 @@ def register():
         try:
             if int(age) < 18:
                 if is_ajax:
-                    return {"success": False, "error": "You must be 18 or older to register", "step": 2}
+                    return {
+                        "success": False,
+                        "error": "You must be 18 or older to register",
+                        "step": 2,
+                    }
                 flash("Error: You must be 18 or older to register", "error")
-                session['reg_form_data'] = request.form.to_dict()
-                session['reg_error_step'] = 2
+                session["reg_form_data"] = request.form.to_dict()
+                session["reg_error_step"] = 2
                 return redirect(url_for("register.register"))
         except ValueError:
             pass
@@ -50,8 +54,8 @@ def register():
             if is_ajax:
                 return {"success": False, "error": "Passwords do not match", "step": 3}
             flash("Error: Passwords do not match", "error")
-            session['reg_form_data'] = request.form.to_dict()
-            session['reg_error_step'] = 3
+            session["reg_form_data"] = request.form.to_dict()
+            session["reg_error_step"] = 3
             return redirect(url_for("register.register"))
 
         hashed_password = generate_password_hash(password)
@@ -71,26 +75,35 @@ def register():
                 name  # Optimize: Store name in session to avoid extra query in character_builder
             )
             if is_ajax:
-                return {"success": True, "redirect": url_for("character_builder.character_builder")}
+                return {
+                    "success": True,
+                    "redirect": url_for("character_builder.character_builder"),
+                }
             flash("Yayyy 🎉 You're in!", "success")
             return redirect(url_for("character_builder.character_builder"))
         except sqlite3.IntegrityError:
             if is_ajax:
                 return {"success": False, "error": "Email already exists", "step": 2}
             flash("Error: Email already exists", "error")
-            session['reg_form_data'] = request.form.to_dict()
-            session['reg_error_step'] = 2
+            session["reg_form_data"] = request.form.to_dict()
+            session["reg_error_step"] = 2
             return redirect(url_for("register.register"))
         except Exception as e:
             if is_ajax:
-                return {"success": False, "error": f"An error occurred: {str(e)}", "step": 1}
+                return {
+                    "success": False,
+                    "error": f"An error occurred: {str(e)}",
+                    "step": 1,
+                }
             flash(f"An error occurred: {str(e)}", "error")
-            session['reg_form_data'] = request.form.to_dict()
-            session['reg_error_step'] = 1
+            session["reg_form_data"] = request.form.to_dict()
+            session["reg_error_step"] = 1
             return redirect(url_for("register.register"))
         finally:
             db.close()
 
-    form_data = session.pop('reg_form_data', {})
-    error_step = session.pop('reg_error_step', 1)
-    return render_template("registration.html", form_data=form_data, error_step=error_step)
+    form_data = session.pop("reg_form_data", {})
+    error_step = session.pop("reg_error_step", 1)
+    return render_template(
+        "registration.html", form_data=form_data, error_step=error_step
+    )

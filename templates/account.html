@@ -167,12 +167,12 @@
     {% else %}
     <div class="account-card" style="text-align: center; padding: 40px;">
         <p style="font-size: 1.1em; color: var(--text-muted); margin-bottom: 16px;">You haven't completed your beauty profile yet!</p>
-        <a href="{{ url_for('character_builder.character_builder') }}" class="account-edit-btn">✨ Create Your Profile</a>
+        <a href="{{ url_for('account.edit_profile') }}" class="account-edit-btn">✨ Create Your Profile</a>
     </div>
     {% endif %}
 
     <div class="account-actions">
-        <a href="{{ url_for('character_builder.character_builder') }}" class="account-edit-btn">✏️ Edit Profile</a>
+        <a href="{{ url_for('account.edit_profile') }}" class="account-edit-btn">✏️ Edit Profile</a>
         <a href="{{ url_for('recommendation.recommendation') }}" class="account-secondary-btn">🤖 AI Recommendations</a>
     </div>
 </div>

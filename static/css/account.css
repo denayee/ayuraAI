@@ -1,6 +1,7 @@
 /* ========== Account Page ========== */
 
 .account-wrapper {
+    width: min(100%, 800px);
     max-width: 800px;
     margin: 40px auto;
     padding: 0 20px 60px;
@@ -15,7 +16,7 @@
     padding: 28px 32px;
     background: var(--surface-card);
     border-radius: 16px;
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(20, 184, 166, 0.2);
     box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
@@ -38,6 +39,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
 }
 
 .account-header-info h1 {
@@ -45,6 +47,11 @@
     font-size: 1.5em;
     font-weight: 700;
     color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    overflow-wrap: anywhere;
 }
 
 .account-username {
@@ -71,7 +78,7 @@
 .account-card {
     background: var(--surface-card);
     border-radius: 14px;
-    border: 1px solid var(--border-color);
+     border: 1px solid rgba(20, 184, 166, 0.2);
     padding: 24px 28px;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.03);
@@ -118,7 +125,11 @@
     color: var(--text-primary);
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 /* Color Dots */
@@ -155,6 +166,7 @@
     display: flex;
     gap: 12px;
     margin-top: 8px;
+    flex-wrap: wrap;
 }
 
 .account-edit-btn,
@@ -168,59 +180,81 @@
     font-weight: 600;
     font-size: 0.95em;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
     text-decoration: none;
+    border: 1px solid rgba(20, 184, 166, 0.2) !important;
+    flex: 1 1 220px;
+    min-width: 0;
 }
 
 .account-edit-btn {
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--btn-text);
+    border: 1px solid transparent !important;
+    box-shadow: var(--button-shadow);
 }
 
 .account-edit-btn:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+    color: var(--btn-text);
+    transform: translateY(-2px);
+    box-shadow: var(--button-shadow-hover);
 }
 
 .account-secondary-btn {
-    background: var(--surface-card);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    background: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border: 1px solid var(--button-secondary-border) !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .account-secondary-btn:hover {
-    background: var(--surface-alt);
-    transform: translateY(-1px);
+    background: var(--button-secondary-hover-bg);
+    color: var(--button-secondary-text);
+    border-color: rgba(var(--primary-rgb), 0.38) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(var(--primary-rgb), 0.16);
 }
 
 /* Inline Name Edit */
 .name-edit-pencil {
-    background: none;
+    background: transparent;
     border: none;
     cursor: pointer;
     font-size: 0.65em;
-    padding: 2px 4px;
-    opacity: 0.4;
-    transition: opacity 0.2s;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 0.7;
+    color: var(--text-muted);
+    border-radius: 8px;
+    transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
     vertical-align: middle;
 }
 
 .name-edit-pencil:hover {
+    background: rgba(var(--primary-rgb), 0.12);
+    color: var(--primary-color);
     opacity: 1;
+    transform: translateY(-1px);
 }
 
 .name-edit-inline {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 4px;
 }
 
 .name-edit-inline input {
     flex: 1;
+    min-width: 0;
     padding: 6px 12px;
     border: 1.5px solid var(--primary-color);
     border-radius: 8px;
@@ -246,7 +280,7 @@
 .name-cancel-btn {
     width: 30px;
     height: 30px;
-    border: none;
+    border: 1px solid transparent;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.9em;
@@ -258,27 +292,54 @@
 }
 
 .name-save-btn {
-    background: var(--primary-color);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--btn-text);
+    box-shadow: var(--button-shadow-soft);
 }
 
 .name-save-btn:hover {
-    background: var(--primary-hover);
-    transform: scale(1.05);
+    background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+    color: var(--btn-text);
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: var(--button-shadow);
 }
 
 .name-cancel-btn {
-    background: var(--surface-alt);
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
+    background: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border-color: var(--button-secondary-border);
 }
 
 .name-cancel-btn:hover {
-    background: var(--border-color);
+    background: var(--button-secondary-hover-bg);
+    color: var(--button-secondary-text);
+    border-color: rgba(var(--primary-rgb), 0.38);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 820px) {
+    .account-wrapper {
+        padding: 0 16px 44px;
+    }
+
+    .account-header,
+    .account-card {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .account-detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 /* Responsive */
 @media (max-width: 600px) {
+    .account-wrapper {
+        margin: 24px auto;
+        padding: 0 12px 36px;
+    }
+
     .account-header {
         flex-direction: column;
         text-align: center;
@@ -289,8 +350,23 @@
         align-items: center;
     }
 
+    .account-header-info h1 {
+        justify-content: center;
+        font-size: 1.35em;
+    }
+
+    .account-badge {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
     .account-detail-grid {
         grid-template-columns: 1fr;
+    }
+
+    .account-card {
+        padding: 20px 16px;
     }
 
     .account-actions {
@@ -300,5 +376,15 @@
     .account-edit-btn,
     .account-secondary-btn {
         width: 100%;
+        flex-basis: 100%;
+    }
+
+    .name-edit-inline {
+        align-items: stretch;
+    }
+
+    .name-edit-actions {
+        width: 100%;
+        justify-content: flex-end;
     }
 }

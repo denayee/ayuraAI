@@ -1,4 +1,12 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, jsonify
+from flask import (
+    Blueprint,
+    render_template,
+    session,
+    redirect,
+    url_for,
+    request,
+    jsonify,
+)
 from database import get_db
 
 account_bp = Blueprint("account", __name__)
@@ -82,6 +90,17 @@ def account():
         db.close()
 
 
+@account_bp.route("/edit-profile")
+def edit_profile():
+    """Redirect to character builder with session flag."""
+    if "user_id" not in session:
+        return redirect(url_for("login.login"))
+
+    # Set a session flag to allow character builder access
+    session["can_edit_profile"] = True
+    return redirect(url_for("character_builder.character_builder"))
+
+
 @account_bp.route("/account/update-name", methods=["POST"])
 def update_name():
     """AJAX endpoint to update user's full name."""
@@ -111,4 +130,3 @@ def update_name():
         return jsonify({"success": False, "error": str(e)})
     finally:
         db.close()
-
