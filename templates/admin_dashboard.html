@@ -1,0 +1,443 @@
+{% extends 'generic_page.html' %}
+
+{% block page_title %}
+        <div style="display: flex; gap: 15px; align-items: center; justify-content: flex-end; width: 100%;">
+            <a href="{{ url_for('login.logout') }}" class="btn-sm btn-danger" style="text-decoration: none; padding: 10px 20px;">🚪 Logout</a>
+        </div>
+{% endblock %}
+
+{% block page_content %}
+<div class="admin-container" style="max-width: 1200px; margin: 0 auto; padding-top: 20px;">
+    <!-- Welcome Heading -->
+    <div style="text-align: center; margin-bottom: 40px; animation: fadeIn 0.8s ease-out;">
+        <h2 style="font-size: clamp(2rem, 5vw, 3rem); color: var(--text-primary); margin-bottom: 10px; letter-spacing: -0.01em;">Welcome, <span style="background: linear-gradient(135deg, var(--primary-color), #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Developer Admin</span></h2>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">Manage your platform data and scheduled events from here.</p>
+    </div>
+    <!-- Tab Navigation -->
+    <div class="admin-tabs" style="display: flex; justify-content: center; gap: 10px; border-bottom: 2px solid var(--border-color); padding-bottom: 0px; margin-bottom: 40px; background: var(--surface-alt); padding: 10px; border-radius: 12px;">
+        <button class="tab-btn active" onclick="openTab(event, 'support')">Support Requests</button>
+        <button class="tab-btn" onclick="openTab(event, 'users')">User Management</button>
+        <button class="tab-btn" onclick="openTab(event, 'stories')">Success Stories</button>
+        <button class="tab-btn" onclick="openTab(event, 'webinar-manage')">Webinars</button>
+    </div>
+
+    <!-- Support Requests Tab -->
+    <div id="support" class="tab-content" style="display: block; max-height: 70vh; overflow-y: auto; overflow-x: hidden; padding-right: 10px;">
+        <h3 style="margin-bottom: 20px; color: var(--primary-color);">Support Requests</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in support_requests %}
+                <tr>
+                    <td>{{ req.id }}</td>
+                    <td>{{ req.name }}</td>
+                    <td>{{ req.email }}</td>
+                    <td>{{ req.phone }}</td>
+                    <td>{{ req.message }}</td>
+                    <td><span class="status-badge {{ req.status }}">{{ req.status }}</span></td>
+                    <td>{{ req.created_at }}</td>
+                    <td>
+                        {% if req.status == 'pending' %}
+                            <button onclick="updateStatus({{ req.id }}, 'completed')" class="btn-sm btn-success">Complete</button>
+                        {% else %}
+                            <button onclick="updateStatus({{ req.id }}, 'pending')" class="btn-sm btn-warning">Re-open</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="users" class="tab-content" style="display: none; max-height: 70vh; overflow-y: auto; padding-right: 10px;">
+        <h3 style="margin-bottom: 20px; color: var(--primary-color);">User Management</h3>
+        
+        <div class="user-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+            {% for user in users %}
+            <div class="user-card" id="user-card-{{ user.id }}" style="background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: 16px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; position: relative;">
+                <div style="padding: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary-color), #2dd4bf); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.2rem;">
+                            {{ user.name[0] | upper }}
+                        </div>
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0; color: var(--text-primary); font-size: 1.1rem; font-weight: 700;">{{ user.name }}</h4>
+                            <p style="margin: 2px 0 0; color: var(--text-muted); font-size: 0.85rem;">@{{ user.username }}</p>
+                        </div>
+                        <button onclick="deleteEntry('user', {{ user.id }})" class="btn-sm btn-danger" style="padding: 8px; border-radius: 8px; margin: 0;">🗑️</button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                        <div style="background: rgba(20, 184, 166, 0.05); padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(20, 184, 166, 0.1);">
+                            <span style="display: block; font-size: 0.75rem; color: var(--primary-color); font-weight: 600; text-transform: uppercase;">Age</span>
+                            <span style="font-weight: 600; color: var(--text-primary);">{{ user.age }}</span>
+                        </div>
+                        <div style="background: rgba(20, 184, 166, 0.05); padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(20, 184, 166, 0.1);">
+                            <span style="display: block; font-size: 0.75rem; color: var(--primary-color); font-weight: 600; text-transform: uppercase;">Gender</span>
+                            <span style="font-weight: 600; color: var(--text-primary);">{{ user.gender }}</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);"><span style="color: var(--primary-color); font-weight: 600;">📧</span> {{ user.email }}</p>
+                        <p style="margin: 5px 0 0; font-size: 0.9rem; color: var(--text-muted);"><span style="color: var(--primary-color); font-weight: 600;">📅</span> Joined: {{ user.created_at.split(' ')[0] }}</p>
+                    </div>
+
+                    <button onclick="toggleUserDetails({{ user.id }})" id="btn-details-{{ user.id }}" class="detail-toggle-btn" style="width: 100%; padding: 10px; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        View Full Profile <span>⌄</span>
+                    </button>
+                </div>
+
+                <!-- Expanded Details Section -->
+                <div id="details-{{ user.id }}" style="display: none; padding: 0 20px 20px; animation: slideDown 0.3s ease-out;">
+                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 0 0 15px 0;">
+                    
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <!-- Skin Profile -->
+                        <div>
+                            <h5 style="margin: 0 0 8px; color: var(--primary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">✨ Skin Profile</h5>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <span class="profile-tag">Type: {{ user.skin_type or 'N/A' }}</span>
+                                <span class="profile-tag">Oil: {{ user.oil_level or 'N/A' }}</span>
+                                <span class="profile-tag">Sensitivity: {{ user.sensitivity_level or 'N/A' }}</span>
+                            </div>
+                            {% if user.skin_problems %}
+                            <p style="margin: 8px 0 0; font-size: 0.85rem; color: var(--text-secondary);"><strong>Problems:</strong> {{ user.skin_problems }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Hair Profile -->
+                        <div>
+                            <h5 style="margin: 0 0 8px; color: var(--primary-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">💇 Hair Profile</h5>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <span class="profile-tag">Type: {{ user.hair_type or 'N/A' }}</span>
+                                <span class="profile-tag">Scalp: {{ user.scalp_condition or 'N/A' }}</span>
+                            </div>
+                            {% if user.hair_problems %}
+                            <p style="margin: 8px 0 0; font-size: 0.85rem; color: var(--text-secondary);"><strong>Problems:</strong> {{ user.hair_problems }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Allergies -->
+                        <div>
+                            <h5 style="margin: 0 0 8px; color: #ef4444; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">🚫 Allergies</h5>
+                            {% if user.allergies %}
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    {% for allergy in user.allergies.split(', ') %}
+                                    <span style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.1);">{{ allergy }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted); font-style: italic;">No allergies reported</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- User Stories Tab -->
+    <div id="stories" class="tab-content" style="display: none; max-height: 70vh; overflow-y: auto; padding-right: 10px;">
+        <h3 style="margin-bottom: 20px; color: var(--primary-color);">User Stories</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Description</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for story in stories %}
+                <tr>
+                    <td>{{ story.id }}</td>
+                    <td>{{ story.name }}</td>
+                    <td>{{ story.email }}</td>
+                    <td>{{ story.description[:50] }}...</td>
+                    <td>{{ story.created_at }}</td>
+                    <td>
+                        <button onclick="deleteEntry('story', {{ story.id }})" class="btn-sm btn-danger">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="webinar-manage" class="tab-content" style="display: none; max-height: 70vh; overflow-y: auto; padding-right: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: var(--primary-color);">Webinars</h3>
+            <button onclick="toggleWebinarForm()" id="btn-toggle-webinar" class="btn-sm" style="background: var(--primary-color); color: white; padding: 10px 20px; font-weight: 600; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
+                <span>➕</span> Schedule New Webinar
+            </button>
+        </div>
+
+        <div id="webinar-form-container" style="display: none; background: var(--surface-alt); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); animation: slideDown 0.3s ease-out;">
+            <form action="{{ url_for('admin.add_webinar') }}" method="POST" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px;">
+                <div class="form-group" style="grid-column: span 3;">
+                    <label style="display: block; margin-bottom: 10px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">Webinar Topic</label>
+                    <input type="text" name="topic" required placeholder="e.g. AI in Dermatology" class="admin-input">
+                </div>
+                <div class="form-group" style="grid-column: span 3;">
+                    <label style="display: block; margin-bottom: 10px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">Webinar Description</label>
+                    <textarea name="description" placeholder="Brief overview of the webinar session..." class="admin-input" style="min-height: 100px; resize: vertical;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 10px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">Date</label>
+                    <input type="date" name="date" required class="admin-input">
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 10px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">Time</label>
+                    <input type="time" name="time" required class="admin-input">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button type="submit" class="btn-sm btn-success" style="padding: 0; height: 48px; width: 100%; border-radius: 10px; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">Schedule Event 🛰️</button>
+                </div>
+            </form>
+        </div>
+
+        <h3 style="margin-bottom: 20px; color: var(--primary-color);">Active Webinars & Registrations</h3>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            {% for web in scheduled_webinars %}
+            <div style="background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; transition: all 0.3s ease;">
+                <div style="padding: 20px; display: flex; justify-content: space-between; align-items: start; background: rgba(20, 184, 166, 0.03);">
+                    <div>
+                        <h4 style="margin: 0; font-size: 1.25rem; color: var(--text-primary);">{{ web.topic }}</h4>
+                        <p style="margin: 5px 0 0; color: var(--text-muted); font-size: 0.9rem;">📅 {{ web.date }} at ⏰ {{ web.time }}</p>
+                        {% if web.description %}
+                            <p style="margin: 10px 0 0; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">{{ web.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="toggleRegistrations({{ web.id }})" class="btn-sm" style="background: var(--primary-color); color: white;">👥 View regs</button>
+                        <button onclick="deleteEntry('webinar', {{ web.id }})" class="btn-sm btn-danger">🗑️ Delete</button>
+                    </div>
+                </div>
+                
+                <!-- Expanded registration table for each webinar -->
+                <div id="regs-{{ web.id }}" style="display: none; padding: 20px; background: var(--surface-color); border-top: 1px solid var(--border-color);">
+                    <h5 style="margin: 0 0 15px; color: var(--primary-color); font-size: 1rem;">Registrations from Users</h5>
+                    {% set ns = namespace(found=false) %}
+                    <table class="admin-table" style="font-size: 0.9rem;">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Registered At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in webinars %}
+                                {% if reg.webinar_id == web.id %}
+                                    {% set ns.found = true %}
+                                    <tr>
+                                        <td>{{ reg.name }}</td>
+                                        <td>{{ reg.email }}</td>
+                                        <td>{{ reg.created_at }}</td>
+                                        <td>
+                                            <button onclick="deleteWebinarReg({{ reg.id }})" class="btn-sm btn-danger">✕</button>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if not ns.found %}
+                        <p id="no-regs-{{ web.id }}" style="margin-top: -15px; background: var(--surface-color); padding: 10px; color: var(--text-muted); font-style: italic; font-size: 0.9rem;">No registrations yet for this session.</p>
+{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--surface-alt);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .admin-table th, .admin-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+        word-break: break-word;
+    }
+    .admin-table th {
+        background: rgba(20, 184, 166, 0.1);
+        color: var(--primary-color);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+    .status-badge.pending { background: #fef3c7; color: #92400e; }
+    .status-badge.completed { background: #d1fae5; color: #065f46; }
+    
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 10px 25px;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-radius: 8px;
+    }
+    .tab-btn.active {
+        color: white;
+        background: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+    }
+    .tab-btn:hover:not(.active) {
+        background: rgba(20, 184, 166, 0.05);
+        color: var(--primary-color);
+    }
+    .btn-sm {
+        padding: 5px 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.85rem;
+        margin-right: 5px;
+        transition: all 0.2s;
+    }
+    .btn-success { background: #10b981; color: white; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-sm:hover { opacity: 0.8; transform: translateY(-1px); scale: 1.02; }
+    
+    .admin-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: var(--surface-color);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+    .admin-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+        background: var(--surface-alt);
+    }
+
+    /* Custom Scrollbar for Tab Content */
+    .tab-content::-webkit-scrollbar {
+        width: 8px;
+    }
+    .tab-content::-webkit-scrollbar-track {
+        background: var(--surface-alt);
+        border-radius: 10px;
+    }
+    .tab-content::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 10px;
+        border: 2px solid var(--surface-alt);
+    }
+    .tab-content::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-color);
+    }
+    
+    .profile-tag {
+        background: rgba(20, 184, 166, 0.1);
+        color: var(--primary-color);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid rgba(20, 184, 166, 0.1);
+    }
+    
+    .user-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-color);
+        box-shadow: 0 12px 30px rgba(20, 184, 166, 0.1);
+    }
+    
+    .detail-toggle-btn:hover {
+        background: var(--primary-color) !important;
+        color: white !important;
+    }
+    
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+</div>
+<script>
+    function toggleUserDetails(userId) {
+        const details = document.getElementById(`details-${userId}`);
+        const btn = document.getElementById(`btn-details-${userId}`);
+        const isVisible = details.style.display === 'block';
+        
+        details.style.display = isVisible ? 'none' : 'block';
+        btn.innerHTML = isVisible ? 
+            'View Full Profile <span>⌄</span>' : 
+            'Close Profile <span>⌃</span>';
+        
+        if (!isVisible) {
+            btn.style.background = 'var(--primary-color)';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = 'var(--primary-color)';
+        }
+    }
+
+    function toggleWebinarForm() {
+        const container = document.getElementById('webinar-form-container');
+        const btn = document.getElementById('btn-toggle-webinar');
+        const isVisible = container.style.display === 'block';
+        
+        container.style.display = isVisible ? 'none' : 'block';
+        btn.innerHTML = isVisible ? 
+            '<span>➕</span> Schedule New Webinar' : 
+            '<span>➖</span> Close Form';
+        
+        if (!isVisible) {
+            btn.style.background = '#64748b'; // Muted slate color when open
+        } else {
+            btn.style.background = 'var(--primary-color)';
+        }
+    }
+</script>
+<script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+{% endblock %}

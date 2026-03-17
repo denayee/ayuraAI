@@ -9,8 +9,12 @@ from routes.ML_prediction import prediction_bp
 from routes.account import account_bp
 from routes.product_search import product_search_bp
 from routes.chatbot import chatbot_bp
+from routes.footer_pages import pages_bp
+from routes.admin import admin_bp
+from flask_mail import Mail
 from dotenv import load_dotenv
 import secrets
+import os
 
 app = Flask(__name__)
 load_dotenv()
@@ -18,6 +22,16 @@ load_dotenv()
 
 # Generate a random SECRET_KEY every time the server starts
 app.config["SECRET_KEY"] = secrets.token_urlsafe(32)
+
+# Mail Configuration
+app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
+app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", 587))
+app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True") == "True"
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_USERNAME")
+
+mail = Mail(app)
 
 # Initialize Google OAuth
 init_google_oauth(app)
@@ -38,11 +52,6 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/about")
-def about():
-    return render_template("about.html")
-
-
 # Register Blueprints
 app.register_blueprint(register_bp, url_prefix="/auth")
 app.register_blueprint(login_bp, url_prefix="/auth")
@@ -54,6 +63,8 @@ app.register_blueprint(prediction_bp)
 app.register_blueprint(account_bp, url_prefix="/routes")
 app.register_blueprint(product_search_bp, url_prefix="/api")
 app.register_blueprint(chatbot_bp, url_prefix="/api")
+app.register_blueprint(pages_bp, url_prefix="/routes")
+app.register_blueprint(admin_bp)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>We've Received Your Message - AyuraAI</title>
+    <!-- CSS will be inlined here by premailer -->
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ayura<span>AI</span></div>
+            </div>
+            <div class="content">
+                <h2>Message Received! 📨</h2>
+                <p>Hello {{ name }},</p>
+                <p>Thank you for reaching out to AyuraAI. We've successfully received your message and our support team is already looking into it.</p>
+                
+                <div class="expiry-note" style="text-align: left; width: 100%; box-sizing: border-box;">
+                    <strong>Your Message Summary:</strong><br>
+                    <p style="margin: 10px 0 0; font-style: italic; color: #475569;">"{{ message_snippet }}"</p>
+                </div>
+
+                <p style="margin-top: 25px;">We typically respond within 24-48 hours. In the meantime, feel free to explore our guides or community forum.</p>
+                
+                <div class="btn-container">
+                    <a href="{{ url_for('pages.guides', _external=True) }}" class="btn">View Help Guides</a>
+                </div>
+                
+                <p>Stay glowing,<br>The AyuraAI Team</p>
+            </div>
+            <div class="footer">
+                <div class="social-links">
+                    <a href="{{ url_for('pages.why_ayuraai', _external=True) }}">Why AyuraAI?</a> • 
+                    <a href="{{ url_for('pages.guides', _external=True) }}">Guides</a> • 
+                    <a href="{{ url_for('pages.contact', _external=True) }}">Support</a>
+                </div>
+                <p>&copy; 2026 AyuraAI Software Inc. All rights reserved.</p>
+                <p>Unlocking your true beauty potential with AI.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

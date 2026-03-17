@@ -27,7 +27,11 @@ load_dotenv()
 def recommendation():
     if "user_id" not in session:
         return redirect(url_for("login.login"))
-
+    
+    # Restrict admins from user-only features
+    if session.get('is_admin'):
+        return redirect(url_for('admin.dashboard'))
+    
     user_id = session["user_id"]
     db = get_db()
     cur = db.cursor()
@@ -159,6 +163,9 @@ def fetch_products():
     """
     if "user_id" not in session:
         return jsonify({"success": False, "error": "Not authenticated"}), 401
+        
+    if session.get('is_admin'):
+        return jsonify({"success": False, "error": "Admins cannot perform this action"}), 403
 
     try:
         data = request.get_json() or {}

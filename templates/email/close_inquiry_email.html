@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Support Inquiry is Resolved - AyuraAI</title>
+    <!-- CSS will be inlined here by premailer -->
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ayura<span>AI</span></div>
+            </div>
+            <div class="content">
+                <h2>Inquiry Resolved! ✅</h2>
+                <p>Hello {{ name }},</p>
+                <p>We're writing to inform you that your support request has been marked as <strong>resolved</strong> by our team.</p>
+                
+                <div class="expiry-note" style="text-align: left; width: 100%; box-sizing: border-box;">
+                    <strong>Original Request Summary:</strong><br>
+                    <p style="margin: 10px 0 0; font-style: italic; color: #475569;">"{{ message_snippet }}"</p>
+                </div>
+
+                <p style="margin-top: 25px;">We hope we were able to assist you effectively. If your issue is still not resolved, or if you have any follow-up questions, please feel free to reply to this email.</p>
+                
+                <p>Thank you for choosing AyuraAI!</p>
+                
+                <p>Best regards,<br>The AyuraAI Support Team</p>
+            </div>
+            <div class="footer">
+                <div class="social-links">
+                    <a href="{{ url_for('pages.why_ayuraai', _external=True) }}">Why AyuraAI?</a> • 
+                    <a href="{{ url_for('pages.guides', _external=True) }}">Guides</a> • 
+                    <a href="{{ url_for('pages.contact', _external=True) }}">Support</a>
+                </div>
+                <p>&copy; 2026 AyuraAI Software Inc. All rights reserved.</p>
+                <p>Unlocking your true beauty potential with AI.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're Registered! 🎉 - AyuraAI Webinars</title>
+    <!-- CSS will be inlined here by premailer -->
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ayura<span>AI</span></div>
+            </div>
+            <div class="content">
+                <h2>You're Registered! 🚀</h2>
+                <p>Hello {{ name }},</p>
+                <p>We're thrilled to confirm your registration for our upcoming webinar:</p>
+                
+                <div class="expiry-note" style="text-align: center; width: 100%; box-sizing: border-box; background-color: #F0FDFA; border: 1px solid #99F6E4;">
+                    <strong style="color: #0d9488; font-size: 18px;">{{ topic }}</strong>
+                </div>
+
+                <p style="margin-top: 25px;">Get ready to dive deep into the world of AI-powered beauty. We'll send you the joining link and further details closer to the event date.</p>
+                
+                <div class="btn-container">
+                    <a href="{{ url_for('pages.webinars', _external=True) }}" class="btn">View All Webinars</a>
+                </div>
+                
+                <p>See you there!<br>The AyuraAI Team</p>
+            </div>
+            <div class="footer">
+                <div class="social-links">
+                    <a href="{{ url_for('pages.why_ayuraai', _external=True) }}">Why AyuraAI?</a> • 
+                    <a href="{{ url_for('pages.guides', _external=True) }}">Guides</a> • 
+                    <a href="{{ url_for('pages.contact', _external=True) }}">Support</a>
+                </div>
+                <p>&copy; 2026 AyuraAI Software Inc. All rights reserved.</p>
+                <p>Unlocking your true beauty potential with AI.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

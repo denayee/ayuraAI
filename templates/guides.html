@@ -1,0 +1,211 @@
+{% extends 'generic_page.html' %}
+
+{% block page_title %}User Guide: AyuraAI Beauty Recommendation{% endblock %}
+
+{% block page_content %}
+<div class="guide-container">
+    <div class="guide-intro">
+        <p>The AI-Based Personalized Cosmetic Product and Home Remedy Recommendation System is designed to help users choose the most suitable cosmetic products and natural remedies based on their unique skin and hair conditions. Using advanced Machine Learning, we provide safe, personalized, and effective beauty care recommendations.</p>
+    </div>
+
+    <div class="guide-steps">
+        <div class="guide-step">
+            <div class="step-header">
+                <span class="step-num">01</span>
+                <h3>Enter Your Skin & Hair Information</h3>
+            </div>
+            <p>To provide accurate recommendations, the system collects critical data about your profile. Users should provide details such as:</p>
+            <ul>
+                <li><strong>Skin Type:</strong> Oily, dry, combination, normal, or sensitive.</li>
+                <li><strong>Hair Condition:</strong> Texture, scalp health, and specific concerns.</li>
+                <li><strong>Problem Areas:</strong> Acne, dandruff, hair fall, dryness, etc.</li>
+                <li><strong>Skin Tone:</strong> Personalized color analysis.</li>
+                <li><strong>Allergies:</strong> Any known sensitivities to ingredients.</li>
+            </ul>
+        </div>
+
+        <div class="guide-step">
+            <div class="step-header">
+                <span class="step-num">02</span>
+                <h3>AI-Based Analysis</h3>
+            </div>
+            <p>Once you input your data, our machine learning algorithms analyze it against extensive datasets. The system identifies patterns in your profile to determine which solutions will yield the best results for your specific physiology.</p>
+        </div>
+
+        <div class="guide-step">
+            <div class="step-header">
+                <span class="step-num">03</span>
+                <h3>Allergy and Safety Check</h3>
+            </div>
+            <p>Safety is our top priority. The system automatically performs a three-point check:</p>
+            <ul>
+                <li>Detects potential allergens based on your profile.</li>
+                <li>Filters out harsh chemicals you wish to avoid.</li>
+                <li>Ensures natural remedies are suitable for your skin sensitivity.</li>
+            </ul>
+        </div>
+
+        <div class="guide-step">
+            <div class="step-header">
+                <span class="step-num">04</span>
+                <h3>Cosmetic Product Recommendations</h3>
+            </div>
+            <p>We suggest professional products tailored specifically to you, focusing on compatibility, ingredient safety, and targeted solutions for problems like acne or hair fall.</p>
+        </div>
+
+        <div class="guide-step">
+            <div class="step-header">
+                <span class="step-num">05</span>
+                <h3>Natural Home Remedy Suggestions</h3>
+            </div>
+            <p>In addition to top-tier products, we recommend chemical-free home remedies using natural ingredients for acne, hydration, and nourishment.</p>
+        </div>
+
+        <div class="guide-step">
+            <div class="step-header">
+                <span class="step-num">06</span>
+                <h3>Step-by-Step Application Guide</h3>
+            </div>
+            <p>Every recommendation comes with a complete implementation plan, including preparation methods, correct quantities, and frequency of use for the best results.</p>
+        </div>
+
+        <div class="guide-step">
+            <div class="step-header">
+                <span class="step-num">07</span>
+                <h3>Continuous Improvement</h3>
+            </div>
+            <p>The system learns from your feedback and data over time, becoming more accurate and personalized with every interaction.</p>
+        </div>
+
+        <div class="guide-step">
+            <div class="step-header">
+                <span class="step-num">08</span>
+                <h3>User-Friendly Experience</h3>
+            </div>
+            <p>Designed for simplicity, the platform provides fast responses and an interactive interface that makes beauty care efficient and convenient.</p>
+        </div>
+    </div>
+
+    <div class="guide-goal">
+        <h3>✅ Goal of the System</h3>
+        <p>Our mission is to empower users to make safe, informed, and personalized beauty care decisions by combining artificial intelligence, cosmetic science, and holistic natural wisdom.</p>
+    </div>
+</div>
+
+<style>
+    .guide-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px 0 60px;
+        text-align: left;
+    }
+
+    .guide-intro {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: var(--text-muted);
+        margin-bottom: 50px;
+        border-left: 4px solid var(--primary-color);
+        padding-left: 25px;
+    }
+
+    .guide-steps {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .guide-step {
+        background: var(--surface-alt);
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .guide-step:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        border-color: var(--primary-color);
+    }
+
+    .step-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .step-num {
+        font-size: 0.9rem;
+        font-weight: 800;
+        background: var(--primary-color);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 8px;
+        letter-spacing: 1px;
+    }
+
+    .step-header h3 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.4rem;
+    }
+
+    .guide-step p {
+        color: var(--text-muted);
+        line-height: 1.7;
+        margin-bottom: 15px;
+    }
+
+    .guide-step ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .guide-step li {
+        margin-bottom: 10px;
+        padding-left: 20px;
+        position: relative;
+        color: var(--text-muted);
+    }
+
+    .guide-step li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    .guide-goal {
+        margin-top: 60px;
+        padding: 40px;
+        background: linear-gradient(135deg, var(--primary-color), #0d9488);
+        border-radius: 24px;
+        color: white;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(20, 184, 166, 0.2);
+    }
+
+    .guide-goal h3 {
+        color: white;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+    }
+
+    .guide-goal p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        opacity: 0.9;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .guide-intro { font-size: 1.1rem; }
+        .step-header h3 { font-size: 1.2rem; }
+        .guide-goal h3 { font-size: 1.5rem; }
+    }
+</style>
+{% endblock %}

@@ -1,4 +1,6 @@
 {% extends 'home.html' %}
+{% block nav_links %}<a href="{{ url_for('recommendation.recommendation') }}">AI Recommendations</a>{% endblock %}
+{% block mobile_nav_links %}<a href="{{ url_for('recommendation.recommendation') }}" class="mobile-nav-link">AI Recommendations</a>{% endblock %}
 {% block home %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
 

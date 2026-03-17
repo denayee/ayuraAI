@@ -1,0 +1,20 @@
+{% extends 'generic_page.html' %}
+
+{% block page_title %}Our Leadership{% endblock %}
+
+{% block page_content %}
+<p>Meet the visionary team behind AyuraAI's mission to personalize wellness for everyone.</p>
+
+<div style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;">
+    <div style="text-align: center;">
+        <div style="width: 150px; height: 150px; background: var(--surface-alt); border-radius: 50%; margin: 0 auto 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary-color); border: 4px solid var(--primary-color);"><img src="{{ url_for('static', filename='images/devarshi.jpg') }}" alt="Devarshi Nayee" style="width: 100%; height: 100%; object-fit: cover;"></div>
+        <h4 style="color: var(--text-primary); margin-bottom: 5px;">Devarshi Nayee</h4>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">AI & Backend Engineer</p>
+    </div>
+    <div style="text-align: center;">
+        <div style="width: 150px; height: 150px; background: var(--surface-alt); border-radius: 50%; margin: 0 auto 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary-color); border: 4px solid var(--primary-color);"><img src="{{ url_for('static', filename='images/vaidehi.jpg') }}" alt="Vaidehi Lukhi" style="width: 100%; height: 100%; object-fit: cover;"></div>
+        <h4 style="color: var(--text-primary); margin-bottom: 5px;">Vaidehi Lukhi</h4>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">UI/UX Developer & QA Tester</p>
+    </div>
+</div>
+{% endblock %}

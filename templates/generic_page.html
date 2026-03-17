@@ -1,0 +1,14 @@
+{% extends 'home.html' %}
+
+{% block home %}
+<div class="generic-page-content" style="padding: {% if request.path.startswith('/admin') %}40px{% else %}180px{% endif %} 5vw 100px; min-height: 80vh; background: var(--bg-base);">
+    <div class="content-container" style="max-width: 1000px; margin: 0 auto;">
+        <h1 style="font-size: clamp(2.5rem, 6vw, 4rem); color: var(--text-primary); margin-bottom: 30px; letter-spacing: -0.02em; text-align: center;">
+            {% block page_title %}{% endblock %}
+        </h1>
+        <div class="page-body" style="color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; text-align: center;">
+            {% block page_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock home %}

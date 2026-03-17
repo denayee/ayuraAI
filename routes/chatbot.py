@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from database import get_db
+from datetime import datetime
+from routes.email_handler import send_contact_confirmation_email
 
 chatbot_bp = Blueprint('chatbot', __name__)
 
@@ -84,10 +86,20 @@ def support_request():
     try:
         cur = db.cursor()
         cur.execute("""
-            INSERT INTO support_requests (user_id, name, email, phone, message)
-            VALUES (?, ?, ?, ?, ?)
-        """, (user_id, name, email, phone, message))
+            INSERT INTO support_requests (user_id, name, email, phone, message, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (user_id, name, email, phone, message, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         db.commit()
+
+        # --- Contact Confirmation Email ---
+        try:
+            # Use a snippet of the message (first 100 chars)
+            snippet = message[:100] + "..." if len(message) > 100 else message
+            send_contact_confirmation_email(email, name, snippet)
+        except Exception as email_err:
+            print(f"Error sending contact confirmation email from chatbot: {email_err}")
+        # ----------------------------------
+
         return jsonify({"success": True, "message": "Your request has been saved. A customer executive will reach you soon."})
     except Exception as e:
         print(f"Error saving support request: {e}")

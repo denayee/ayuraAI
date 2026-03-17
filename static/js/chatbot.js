@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentMode = 'standard'; // 'standard' or 'something_else'
     let lastUserQuery = '';
+    let welcomedThisPage = false;
 
     // Menu Definitions
     const MAIN_MENU_OPTIONS = [
@@ -50,12 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cycleGreeting = () => {
         currentGreetingIndex = (currentGreetingIndex + 1) % GREETING_MESSAGES.length;
-        greetingBubble.style.opacity = '0';
+        
+        // Use a class for cycling to avoid inline style conflicts
+        greetingBubble.classList.add('transitioning');
+        
         setTimeout(() => {
             greetingBubble.textContent = GREETING_MESSAGES[currentGreetingIndex];
-            if (greetingBubble.classList.contains('show')) {
-                greetingBubble.style.opacity = '1';
-            }
+            greetingBubble.classList.remove('transitioning');
         }, 500);
     };
 
@@ -83,6 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isActive) {
             hideGreeting();
             if (!chatInput.disabled) chatInput.focus();
+            
+            // Trigger welcome message on first open of this page
+            if (!welcomedThisPage) {
+                setTimeout(() => {
+                    addMessage("Hello! I'm your AyuraAI assistant. How can I help you today?", 'bot');
+                    welcomedThisPage = true;
+                }, 500);
+            }
         } else {
             // Re-show greeting after a short delay if closed
             setTimeout(showGreeting, 1000);
@@ -348,8 +358,5 @@ document.addEventListener('DOMContentLoaded', () => {
         return indicator;
     }
 
-    // Welcome message
-    setTimeout(() => {
-        addMessage("Hello! I'm your AyuraAI assistant. How can I help you today?", 'bot');
-    }, 1000);
+    // Initial greeting bubble logic is handled by setTimeout at top
 });

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to AyuraAI! ✨</title>
+    <!-- CSS will be inlined here by premailer -->
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <div class="logo">Ayura<span>AI</span></div>
+            </div>
+            <div class="content">
+                <h2>Welcome aboard, {{ name }}! 🌸</h2>
+                <p>We're so excited to have you join the AyuraAI family. You've just taken the first step towards a smarter, more personalized beauty routine.</p>
+                <p>With AyuraAI, you can unlock the secrets of your skin and hair using our advanced AI analysis. Get ready to glow like never before! ✨</p>
+                <div class="btn-container">
+                    <a href="{{ start_url }}" class="btn">Start AI Analysis</a>
+                </div>
+                <p>If you have any questions, our support team is always here to help. Just reply to this email or visit our community.</p>
+                <p>Stay glowing,<br>The AyuraAI Team</p>
+            </div>
+            <div class="footer">
+                <div class="social-links">
+                    <a href="{{ url_for('pages.why_ayuraai', _external=True) }}">Why AyuraAI?</a> • 
+                    <a href="{{ url_for('pages.guides', _external=True) }}">Guides</a> • 
+                    <a href="{{ url_for('pages.contact', _external=True) }}">Support</a>
+                </div>
+                <p>&copy; 2026 AyuraAI Software Inc. All rights reserved.</p>
+                <p>Unlocking your true beauty potential with AI.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

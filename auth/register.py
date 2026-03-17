@@ -3,6 +3,8 @@ import sqlite3
 from werkzeug.security import generate_password_hash
 from dotenv import load_dotenv
 from database import get_db
+from datetime import datetime
+from routes.email_handler import send_welcome_email
 
 register_bp = Blueprint("register", __name__)
 load_dotenv()
@@ -64,8 +66,8 @@ def register():
         try:
             cur = db.cursor()
             cur.execute(
-                "INSERT INTO users (name, username, email, password, age, gender) VALUES (?, ?, ?, ?, ?, ?)",
-                (name, username, email, hashed_password, age, gender),
+                "INSERT INTO users (name, username, email, password, age, gender, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (name, username, email, hashed_password, age, gender, datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
             )
             user_id = cur.lastrowid
             db.commit()
@@ -74,6 +76,11 @@ def register():
             session["name"] = (
                 name  # Optimize: Store name in session to avoid extra query in character_builder
             )
+
+            # --- Welcome Email Sending ---
+            send_welcome_email(email, name)
+            # ---------------------------
+
             if is_ajax:
                 return {
                     "success": True,

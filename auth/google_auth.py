@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash
 from database import get_db
 import os
 from dotenv import load_dotenv
+from routes.email_handler import send_welcome_email
 
 load_dotenv()
 
@@ -123,6 +124,10 @@ def google_callback():
                 user_id = cur.lastrowid
                 user_name = name
                 db.commit()
+
+                # --- Welcome Email Sending ---
+                send_welcome_email(email, name)
+                # ---------------------------
 
                 # Set session
                 session["user_id"] = user_id

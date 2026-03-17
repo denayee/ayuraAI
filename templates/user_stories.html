@@ -1,0 +1,179 @@
+{% extends 'generic_page.html' %}
+
+{% block page_title %}User Stories{% endblock %}
+
+{% block page_content %}
+<p>Read how AyuraAI has helped our community achieve their wellness goals through personalized analysis and care.</p>
+
+<div style="text-align: center; margin-top: 30px;">
+    <button id="toggle-story-form" class="btn-primary" style="padding: 12px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(20, 184, 166, 0.2);">
+        ✨ Share Your Story
+    </button>
+</div>
+
+<div id="story-form-container" style="display: none; margin-top: 40px;">
+    <section class="share-story-section" style="padding: 40px; background: var(--surface-alt); border-radius: 30px; border: 1px solid var(--border-color); position: relative;">
+        <button id="close-story-form" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 30px; font-size: 1.8rem;">✨ Tell Us Your Experience</h3>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Your story helps others understand the power of personalized AI beauty care.</p>
+        
+        <form id="ajax-story-form" action="{{ url_for('pages.user_stories') }}" method="POST" class="contact-form" style="max-width: 700px; margin: 0 auto;">
+            <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="story-name">Name</label>
+                    <input type="text" id="story-name" name="name" placeholder="Your Name" required>
+                    <span class="error-feedback" id="error-name"></span>
+                </div>
+                <div class="form-group">
+                    <label for="story-email">Email Address</label>
+                    <input type="email" id="story-email" name="email" placeholder="Email Address" required>
+                    <span class="error-feedback" id="error-email"></span>
+                </div>
+            </div>
+            <div class="form-group full" style="margin-top: 20px;">
+                <label for="story-description">Describe Your Experience</label>
+                <textarea id="story-description" name="description" rows="5" placeholder="Tell us how AyuraAI helped you..." required></textarea>
+                <span class="error-feedback" id="error-description"></span>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 1.1rem;">Submit My Story ✨</button>
+        </form>
+    </section>
+</div>
+
+<div class="stories-scroll-container" style="max-height: 600px; overflow-y: auto; padding-right: 15px; margin-top: 50px; scrollbar-width: thin; scrollbar-color: var(--primary-color) var(--surface-alt);">
+    <div style="display: flex; flex-direction: column; gap: 40px;">
+        {% if stories %}
+            {% for story in stories %}
+            <blockquote class="user-story-card" style="padding: 40px; background: var(--surface-alt); border-radius: 20px; position: relative; border-left: 10px solid var(--primary-color); transition: transform 0.3s ease; animation: fadeIn 0.5s ease-out forwards;">
+                <p style="font-style: italic; font-size: 1.2rem; margin-bottom: 20px; color: var(--text-primary);">"{{ story.description }}"</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <cite style="font-weight: 700; color: var(--primary-color);">
+                        — {{ story.name }}
+                        {% if story.user_exists %}
+                            <span style="font-size: 0.75rem; background: var(--primary-color); color: white; padding: 2px 8px; border-radius: 50px; margin-left: 10px; font-weight: 600;">Verified User</span>
+                        {% endif %}
+                    </cite>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">{{ story.created_at.split(' ')[0] if story.created_at else '' }}</span>
+                </div>
+            </blockquote>
+            {% endfor %}
+        {% else %}
+            <!-- Original hardcoded stories if DB is empty -->
+            <blockquote style="padding: 40px; background: var(--surface-alt); border-radius: 20px; position: relative; border-left: 10px solid var(--primary-color);">
+                <p style="font-style: italic; font-size: 1.2rem; margin-bottom: 20px;">"AyuraAI finally helped me understand why certain products were irritating my skin. The allergy matching feature is a lifesaver!"</p>
+                <cite style="font-weight: 700; color: var(--text-primary);">— Sarah J., Verified User</cite>
+            </blockquote>
+
+            <blockquote style="padding: 40px; background: var(--surface-alt); border-radius: 20px; position: relative; border-left: 10px solid var(--primary-color);">
+                <p style="font-style: italic; font-size: 1.2rem; margin-bottom: 20px;">"The natural remedies recommended by the AI were exactly what I needed for my hair health. I love the balance of science and nature."</p>
+                <cite style="font-weight: 700; color: var(--text-primary);">— Michael T., Verified User</cite>
+            </blockquote>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .stories-scroll-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .stories-scroll-container::-webkit-scrollbar-track {
+        background: var(--surface-alt);
+        border-radius: 10px;
+    }
+    .stories-scroll-container::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 10px;
+    }
+    .stories-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #0d9488;
+    }
+</style>
+
+<!-- Floating Notification Container -->
+<div id="notification-container" style="position: fixed; top: 120px; left: 50%; transform: translateX(-50%); z-index: 10001; display: flex; flex-direction: column; align-items: center; gap: 15px; pointer-events: none; width: 100%; max-width: 600px; padding: 0 20px;"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('ajax-story-form');
+    const notificationContainer = document.getElementById('notification-container');
+    const toggleBtn = document.getElementById('toggle-story-form');
+    const closeBtn = document.getElementById('close-story-form');
+    const formContainer = document.getElementById('story-form-container');
+
+    toggleBtn.addEventListener('click', () => {
+        formContainer.style.display = 'block';
+        toggleBtn.style.display = 'none';
+        formContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        formContainer.style.display = 'none';
+        toggleBtn.style.display = 'block';
+    });
+    
+    function showNotification(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `contact-${type} floating-toast`;
+        toast.innerHTML = `
+            <div style="flex-grow: 1;">${message}</div>
+            <span style="cursor: pointer; font-size: 1.5rem; margin-left: 20px; line-height: 1; font-weight: bold;" onclick="this.parentElement.remove()">×</span>
+        `;
+        toast.style.pointerEvents = 'auto';
+        toast.style.display = 'flex';
+        toast.style.alignItems = 'center';
+        toast.style.justifyContent = 'space-between';
+        toast.style.textAlign = 'center';
+        toast.style.padding = '18px 25px';
+        notificationContainer.appendChild(toast);
+        
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => toast.remove(), 500);
+            }
+        }, 15000);
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        document.querySelectorAll('.error-feedback').forEach(el => el.textContent = '');
+        
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                showNotification(result.message, 'success');
+                form.reset();
+                setTimeout(() => {
+                    location.reload(); // Reload to show the new story
+                }, 2000);
+            } else {
+                if (result.errors) {
+                    for (const [field, msg] of Object.entries(result.errors)) {
+                        const errorEl = document.getElementById(`error-${field}`);
+                        if (errorEl) errorEl.textContent = msg;
+                    }
+                    showNotification('Please correct the errors in the form.', 'error');
+                } else if (result.error) {
+                    showNotification(result.error, 'error');
+                }
+            }
+        } catch (err) {
+            showNotification('Failed to submit story. Please try again later.', 'error');
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'generic_page.html' %}
+
+{% block page_title %}Webinars & Events{% endblock %}
+
+{% block page_content %}
+<p>Join our expert-led webinars to stay updated on the latest trends in AI-powered wellness and personal care.</p>
+
+{% if webinars %}
+    {% for webinar in webinars %}
+    <div style="margin-top: 40px; padding: 40px; background: var(--surface-alt); border-radius: 20px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px; color: var(--primary-color);">Upcoming: {{ webinar.topic }}</h3>
+        <p style="margin-bottom: 25px; color: var(--text-muted);">Date: {{ webinar.date }} | Time: {{ webinar.time }}</p>
+        {% if webinar.description %}
+            <p style="margin-bottom: 25px; color: var(--text-secondary); max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">{{ webinar.description }}</p>
+        {% endif %}
+        
+        <button id="toggle-registration-{{ webinar.id }}" class="btn-primary toggle-btn" data-webinar-id="{{ webinar.id }}" style="padding: 15px 35px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-block;">
+            Register Now
+        </button>
+
+        <div id="registration-form-container-{{ webinar.id }}" class="form-container" style="display: none; margin-top: 40px; text-align: left; max-width: 650px; margin-left: auto; margin-right: auto; padding: 40px; background: rgba(255, 255, 255, 0.05); border-radius: 20px; border: 1px solid var(--border-color); backdrop-filter: blur(10px); position: relative; animation: slideDown 0.4s ease-out;">
+            <button class="close-btn" data-webinar-id="{{ webinar.id }}" style="position: absolute; top: 15px; right: 20px; background: rgba(0,0,0,0.1); border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">&times;</button>
+            
+            <div style="margin-bottom: 25px;">
+                <h4 style="margin-bottom: 8px; color: var(--text-primary); font-size: 1.4rem;">Secure Your Spot 🛰️</h4>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Fill in your details to receive the webinar link and exclusive pre-event materials.</p>
+            </div>
+
+            <form action="{{ url_for('pages.webinars') }}" method="POST" class="premium-form dynamic-webinar-form">
+                <input type="hidden" name="topic" value="{{ webinar.topic }}">
+                <input type="hidden" name="webinar_id" value="{{ webinar.id }}">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div class="form-group">
+                        <label for="reg-name-{{ webinar.id }}" style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--primary-color);">Full Name</label>
+                        <input type="text" id="reg-name-{{ webinar.id }}" name="name" placeholder="e.g. Alex Rivera" required style="width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-primary); transition: all 0.3s ease;">
+                        <span class="error-feedback" id="error-name-{{ webinar.id }}" style="color: #ef4444; font-size: 0.8rem; margin-top: 5px; display: block;"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email-{{ webinar.id }}" style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--primary-color);">Email Address</label>
+                        <input type="email" id="reg-email-{{ webinar.id }}" name="email" placeholder="alex@example.com" required style="width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-primary); transition: all 0.3s ease;">
+                        <span class="error-feedback" id="error-email-{{ webinar.id }}" style="color: #ef4444; font-size: 0.8rem; margin-top: 5px; display: block;"></span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px; padding: 15px; background: rgba(20, 184, 166, 0.05); border-radius: 12px; border-left: 4px solid var(--primary-color);">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                        <strong style="color: var(--primary-color);">Note:</strong> By registering, you agree to receive a one-time reminder email 1 hour before the session starts.
+                    </p>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 30px; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px; box-shadow: 0 10px 25px rgba(20, 184, 166, 0.2); cursor: pointer; border: none; background: var(--primary-color); color: white; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                    Confirm Registration 🛰️
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p style="margin-top: 50px; text-align: center; color: var(--text-muted);">Check back soon for more scheduled events!</p>
+{% endif %}
+
+<!-- Floating Notification Container -->
+<div id="notification-container" style="position: fixed; top: 120px; left: 50%; transform: translateX(-50%); z-index: 10001; display: flex; flex-direction: column; align-items: center; gap: 15px; pointer-events: none; width: 100%; max-width: 600px; padding: 0 20px;"></div>
+
+<script src="{{ url_for('static', filename='js/webinars.js') }}"></script>
+{% endblock %}

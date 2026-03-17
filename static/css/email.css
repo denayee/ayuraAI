@@ -1,0 +1,102 @@
+/* Project Branding Colors */
+:root {
+    --primary-color: #0d9488; /* Teal 600 */
+    --primary-hover: #0f766e; /* Teal 700 */
+    --bg-base: #F8FAFC; /* Slate 50 */
+    --text-primary: #0F172A; /* Slate 900 */
+    --text-secondary: #475569; /* Slate 600 */
+    --border-color: #E2E8F0; /* Slate 200 */
+}
+
+body {
+    font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F8FAFC;
+    margin: 0;
+    padding: 0;
+    color: #0F172A;
+}
+.wrapper {
+    width: 100%;
+    table-layout: fixed;
+    background-color: #F8FAFC;
+    padding-bottom: 40px;
+}
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(13, 148, 136, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.1);
+}
+.header {
+    background-color: #ffffff;
+    padding: 40px 30px 20px;
+    text-align: center;
+}
+.logo {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0d9488;
+    letter-spacing: -1px;
+    text-decoration: none;
+}
+.logo span {
+    color: #475569;
+}
+.content {
+    padding: 20px 40px 40px;
+    text-align: center;
+}
+.content h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 16px;
+}
+.content p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #475569;
+    margin-bottom: 24px;
+}
+.btn-container {
+    margin: 35px 0;
+}
+.btn {
+    background: linear-gradient(135deg, #0d9488, #0f766e);
+    color: #ffffff !important;
+    padding: 16px 35px;
+    text-decoration: none;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 16px;
+    display: inline-block;
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.24);
+}
+.expiry-note {
+    font-size: 13px;
+    color: #64748B;
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #F1F5F9;
+    border-radius: 10px;
+    display: inline-block;
+}
+.footer {
+    padding: 30px;
+    text-align: center;
+    font-size: 13px;
+    color: #64748B;
+    border-top: 1px solid #E2E8F0;
+}
+.social-links {
+    margin-bottom: 15px;
+}
+.social-links a {
+    color: #0d9488;
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: 600;
+}

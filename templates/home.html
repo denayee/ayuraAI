@@ -10,6 +10,7 @@
     {% block page_top_background %}{% endblock %}
 
     <!-- Navbar -->
+    {% if not request.path.startswith('/admin') %}
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="logo" aria-label="AyuraAI home">
@@ -19,29 +20,37 @@
 
             <!-- Desktop Nav -->
             <nav class="nav-desktop">
-                <a href="/">Home</a>
-                <a href="{{ url_for('about') }}">About</a>
-                {% block nav_links %}
-                <a href="/#features">Features</a>
-                <a href="/#how">How It Works</a>
-                <a href="/#contact">Contact</a>
-                {% endblock %}
+                {% if not session.get('is_admin') %}
+            <div class="nav-links">
+                    <a href="/">Home</a>
+                    {% if not session.get('user_id') %}
+                    <a href="{{ url_for('pages.about') }}">About</a>
+                    {% endif %}
+                    {% block nav_links %}
+                    <a href="/#features">Features</a>
+                    <a href="/#how">How It Works</a>
+                    <a href="{{ url_for('pages.contact') }}">Contact</a>
+                    {% endblock %}
+            </div>
+                {% endif %}
             </nav>
 
             <div class="nav-actions">
                 {% if 'user_id' in session %}
-                    <div class="user-menu">
-                        <div class="user-avatar" id="avatar-btn">
-                            {{ session.get('name', 'U')[0] | upper }}
+                    {% if not session.get('is_admin') %}
+                        <div class="user-menu">
+                            <div class="user-avatar" id="avatar-btn">
+                                {{ session.get('name', 'U')[0] | upper }}
+                            </div>
+                            <div class="dropdown-menu">
+                                <a href="{{ url_for('account.account') }}">👤 My Account</a>
+                                {% if not session.get('is_admin') and not session.get('profile_complete') %}
+                                    <a href="{{ url_for('account.edit_profile') }}">✏️ Complete Profile</a>
+                                {% endif %}
+                                <a href="{{ url_for('login.logout') }}">🚪 Logout</a>
+                            </div>
                         </div>
-                        <div class="dropdown-menu">
-                            <a href="{{ url_for('account.account') }}">👤 My Account</a>
-                            {% if not session.get('profile_complete') %}
-                                <a href="{{ url_for('account.edit_profile') }}">✏️ Complete Profile</a>
-                            {% endif %}
-                            <a href="{{ url_for('login.logout') }}">🚪 Logout</a>
-                        </div>
-                    </div>
+                    {% endif %}
                 {% else %}
                     <a href="{{ url_for('login.login') }}" class="login">Login</a>
                     <a href="{{ url_for('register.register') }}" class="btn">Get Started</a>
@@ -57,27 +66,39 @@
             </button>
         </div>
     </nav>
+    {% endif %}
 
+    {% if not request.path.startswith('/admin') %}
     <!-- Mobile Nav Dropdown -->
     <div class="mobile-nav" id="mobileNav">
-        <a href="{{ url_for('about') }}" class="mobile-nav-link">About</a>
-        {% block mobile_nav_links %}
-        <a href="/#features" class="mobile-nav-link">Features</a>
-        <a href="/#how" class="mobile-nav-link">How It Works</a>
-        <a href="/#contact" class="mobile-nav-link">Contact</a>
-        {% endblock %}
+        {% if not session.get('user_id') %}
+            <a href="{{ url_for('pages.about') }}" class="mobile-nav-link">About</a>
+        {% endif %}
+        {% if not session.get('is_admin') %}
+            {% block mobile_nav_links %}
+            <a href="/#features" class="mobile-nav-link">Features</a>
+            <a href="/#how" class="mobile-nav-link">How It Works</a>
+            <a href="{{ url_for('pages.contact') }}" class="mobile-nav-link">Contact</a>
+            {% endblock %}
+        {% endif %}
         <hr class="mobile-nav-divider">
         {% if 'user_id' in session %}
-            <div class="mobile-nav-user">
-                <span class="mobile-user-avatar">{{ session.get('name', 'U')[0] | upper }}</span>
-                <span>{{ session.get('name', 'User') }}</span>
-            </div>
-            <a href="{{ url_for('account.account') }}" class="mobile-nav-link">👤 My Account</a>
-            {% if not session.get('profile_complete') %}
-                <a href="{{ url_for('account.edit_profile') }}" class="mobile-nav-link">✏️ Complete Profile</a>
+            {% if session.get('is_admin') %}
+                <a href="{{ url_for('login.logout') }}" class="mobile-nav-link mobile-nav-logout">🚪 Logout</a>
+            {% else %}
+                <div class="mobile-nav-user">
+                    <span class="mobile-user-avatar">{{ session.get('name', 'U')[0] | upper }}</span>
+                    <span>{{ session.get('name', 'User') }}</span>
+                </div>
+                <a href="{{ url_for('account.account') }}" class="mobile-nav-link">👤 My Account</a>
+                {% if not session.get('is_admin') %}
+                    {% if not session.get('profile_complete') %}
+                        <a href="{{ url_for('account.edit_profile') }}" class="mobile-nav-link">✏️ Complete Profile</a>
+                    {% endif %}
+                    <a href="{{ url_for('recommendation.recommendation') }}" class="mobile-nav-link">🤖 AI Recommendation</a>
+                {% endif %}
+                <a href="{{ url_for('login.logout') }}" class="mobile-nav-link mobile-nav-logout">🚪 Logout</a>
             {% endif %}
-            <a href="{{ url_for('recommendation.recommendation') }}" class="mobile-nav-link">🤖 AI Recommendation</a>
-            <a href="{{ url_for('login.logout') }}" class="mobile-nav-link mobile-nav-logout">🚪 Logout</a>
         {% else %}
             <a href="{{ url_for('login.login') }}" class="mobile-nav-link">Login</a>
             <a href="{{ url_for('register.register') }}" class="mobile-nav-link mobile-nav-cta">✨ Get Started</a>
@@ -86,6 +107,7 @@
             <span>Theme</span>
             <button class="theme-toggle-btn" id="themeToggleMobile" aria-label="Toggle dark mode">🌙</button>
         </div>
+    {% endif %}
     </div>
 
 
@@ -112,15 +134,70 @@
 
 
 
-     <!-- Footer -->
+    {% if not request.path.startswith('/admin') %}
+    <!-- Premium Footer -->
+    {% if not session.get('is_admin') %}
     <footer id="contact" class="footer">
-        <p>© 2026 AyuraAI | AI-Based Cosmetic & Home Remedy System</p>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.ico') }}" alt="AyuraAI logo" class="logo-image">
+                    <span class="logo-text">AyuraAI</span>
+                </a>
+                <p class="brand-description">
+                    Premium AI-powered skincare and haircare analysis. Tailored routines for your unique physiological profile.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-main">
+            <div class="footer-column">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="{{ url_for('pages.why_ayuraai') }}">Why AyuraAI?</a></li>
+                    <li><a href="{{ url_for('pages.user_stories') }}">User Stories</a></li>
+                    <li><a href="{{ url_for('pages.guides') }}">Guides</a></li>
+                    <li><a href="{{ url_for('pages.webinars') }}">Webinars</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="{{ url_for('pages.about') }}">About us</a></li>
+                    <li><a href="{{ url_for('pages.leadership') }}">Leadership</a></li>
+                    <li><a href="{{ url_for('pages.partners') }}">Partners</a></li>
+                    <li><a href="{{ url_for('pages.contact') }}">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Social</h3>
+                <ul>
+                    <li><a href="#">LinkedIn</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Instagram</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 AyuraAI Software Inc.</p>
+            <div class="footer-bottom-links">
+                <a href="#">Support</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
     </footer>
+    {% endif %}
+    {% endif %}
 
     <!-- Main JS (Theme, Nav, UI Globals) -->
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 
     <!-- Chatbot UI (Global) -->
+    {% if not session.get('is_admin') %}
     <div class="chatbot-container">
         <button id="chatbot-toggle" class="chatbot-toggle" aria-label="Open Chat Support">
             🤖
@@ -148,5 +225,6 @@
     <!-- Chatbot Assets -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
     <script src="{{ url_for('static', filename='js/chatbot.js') }}" defer></script>
+    {% endif %}
 </body>
 </html>
