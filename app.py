@@ -13,15 +13,18 @@ from routes.footer_pages import pages_bp
 from routes.admin import admin_bp
 from flask_mail import Mail
 from dotenv import load_dotenv
-import secrets
+from flask_cors import CORS
 import os
+import create_db
 
 app = Flask(__name__)
+CORS(app)
 load_dotenv()
-
+if not os.path.exists("database.db"):
+    create_db.create_database()
 
 # Generate a random SECRET_KEY every time the server starts
-app.config["SECRET_KEY"] = secrets.token_urlsafe(32)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "your-secret-key")
 
 # Mail Configuration
 app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
@@ -52,6 +55,12 @@ def home():
     return render_template("index.html")
 
 
+# Test Route (for Render deployment check)
+@app.route("/test")
+def test():
+    return "Backend Working ✅"
+
+
 # Register Blueprints
 app.register_blueprint(register_bp, url_prefix="/auth")
 app.register_blueprint(login_bp, url_prefix="/auth")
@@ -68,5 +77,5 @@ app.register_blueprint(admin_bp)
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
