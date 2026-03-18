@@ -5,6 +5,7 @@ from database import get_db
 import os
 from dotenv import load_dotenv
 from routes.email_handler import send_welcome_email
+from request_helpers import get_request_data, wants_json_response
 
 load_dotenv()
 
@@ -157,18 +158,26 @@ def complete_profile():
         return redirect(url_for("login.login"))
 
     if request.method == "POST":
-        age = request.form.get("age")
-        gender = request.form.get("gender")
+        is_api_request = wants_json_response()
+        data = get_request_data()
+        age = str(data.get("age", "")).strip()
+        gender = data.get("gender", "").strip()
 
         if not age or not gender:
+            if is_api_request:
+                return {"success": False, "error": "Please fill in both fields."}, 400
             flash("Please fill in both fields", "error")
             return redirect(url_for("google_auth.complete_profile"))
 
         try:
             if int(age) < 18:
+                if is_api_request:
+                    return {"success": False, "error": "You must be 18 or older."}, 400
                 flash("Error: You must be 18 or older", "error")
                 return redirect(url_for("google_auth.complete_profile"))
         except ValueError:
+            if is_api_request:
+                return {"success": False, "error": "Invalid age."}, 400
             flash("Error: Invalid age", "error")
             return redirect(url_for("google_auth.complete_profile"))
 
@@ -180,10 +189,20 @@ def complete_profile():
                 (age, gender, session["user_id"]),
             )
             db.commit()
+            session["age"] = int(age) if age.isdigit() else age
             session["gender"] = gender
+            session["can_edit_profile"] = True
+            if is_api_request:
+                return {
+                    "success": True,
+                    "message": "Profile complete! Let's glow!",
+                    "redirect": url_for("character_builder.character_builder"),
+                }
             flash("Profile complete! 🎉 Let's glow!", "success")
             return redirect(url_for("character_builder.character_builder"))
         except Exception as e:
+            if is_api_request:
+                return {"success": False, "error": f"An error occurred: {str(e)}"}, 500
             flash(f"An error occurred: {str(e)}", "error")
             return redirect(url_for("google_auth.complete_profile"))
         finally:

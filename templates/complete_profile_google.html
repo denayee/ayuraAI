@@ -5,9 +5,10 @@
 
 <div class="auth-container">
     <div class="auth-card">
-        <div class="cute-form-greeting">Almost there! ✨</div>
+        <div class="cute-form-greeting">Almost there</div>
         <h2>Complete Your Profile</h2>
         <p>We just need a couple more details to personalize your experience</p>
+        <div id="google-profile-alerts"></div>
 
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -19,7 +20,7 @@
             {% endif %}
         {% endwith %}
 
-        <form action="{{ url_for('google_auth.complete_profile') }}" method="POST" class="auth-form">
+        <form id="googleProfileForm" data-endpoint="{{ url_for('google_auth.complete_profile') }}" class="auth-form">
             <div class="form-row">
                 <div class="form-group">
                     <label for="age">Age</label>
@@ -36,7 +37,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-primary full-width" style="margin-top: 15px;">Continue 🚀</button>
+            <button type="submit" class="btn-primary full-width" style="margin-top: 15px;">Continue</button>
         </form>
     </div>
 </div>
@@ -44,6 +45,41 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     document.body.classList.add('has-auth-bg');
+
+    const form = document.getElementById('googleProfileForm');
+    const alerts = document.getElementById('google-profile-alerts');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+
+    function showAlert(message) {
+        alerts.innerHTML = `<div class="flash-messages"><div class="alert">${message}</div></div>`;
+    }
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        alerts.innerHTML = '';
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+
+        try {
+            const { response, result } = await window.AyuraApi.jsonRequest(form.dataset.endpoint, {
+                method: 'POST',
+                data: window.AyuraApi.formToJson(form),
+            });
+
+            if (response.ok && result.success) {
+                window.location.href = result.redirect;
+                return;
+            }
+
+            showAlert(result.error || 'Unable to complete your profile.');
+        } catch (error) {
+            showAlert('Unable to connect right now. Please try again.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        }
+    });
 });
 </script>
 

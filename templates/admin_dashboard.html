@@ -190,7 +190,7 @@
         </div>
 
         <div id="webinar-form-container" style="display: none; background: var(--surface-alt); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); animation: slideDown 0.3s ease-out;">
-            <form action="{{ url_for('admin.add_webinar') }}" method="POST" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px;">
+            <form data-endpoint="{{ url_for('admin.add_webinar') }}" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px;">
                 <div class="form-group" style="grid-column: span 3;">
                     <label style="display: block; margin-bottom: 10px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">Webinar Topic</label>
                     <input type="text" name="topic" required placeholder="e.g. AI in Dermatology" class="admin-input">

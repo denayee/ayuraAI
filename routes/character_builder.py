@@ -2,6 +2,7 @@ from flask import Blueprint, request, session, redirect, render_template, url_fo
 import os
 from dotenv import load_dotenv
 from database import get_db
+from request_helpers import get_request_data, get_request_list, wants_json_response
 
 character_bp = Blueprint("character_builder", __name__)
 
@@ -10,15 +11,26 @@ load_dotenv()
 
 @character_bp.route("/character-builder", methods=["GET", "POST"])
 def character_builder():
-    # 🔐 Protect route (user must be logged in)
+    is_api_request = request.method == "POST" and wants_json_response()
+
     if "user_id" not in session:
+        if is_api_request:
+            return {
+                "success": False,
+                "error": "You must be logged in to update your profile.",
+                "redirect": url_for("login.login"),
+            }, 401
         return redirect(url_for("login.login"))
 
-    # 🔐 User must click Edit Profile button to access this page
     if not session.get("can_edit_profile"):
+        if is_api_request:
+            return {
+                "success": False,
+                "error": "Profile editing is not enabled for this session.",
+                "redirect": url_for("account.account"),
+            }, 403
         return redirect(url_for("account.account"))
 
-    # Ensure gender and age are in session (may be missing for users logged in before this was added)
     if "gender" not in session or "age" not in session:
         db = get_db()
         cur = db.cursor()
@@ -28,29 +40,24 @@ def character_builder():
         session["age"] = row[1] if row and row[1] else 25
         db.close()
 
-    # Fetch existing profile data for editing (GET request)
     existing_profile = None
     if request.method == "GET":
         user_id = session["user_id"]
         db = get_db()
         try:
             cur = db.cursor()
-
-            # Get skin profile
             cur.execute(
                 "SELECT * FROM skin_profile WHERE user_id = ? ORDER BY id DESC LIMIT 1",
                 (user_id,),
             )
             skin_row = cur.fetchone()
 
-            # Get hair profile
             cur.execute(
                 "SELECT * FROM hair_profile WHERE user_id = ? ORDER BY id DESC LIMIT 1",
                 (user_id,),
             )
             hair_row = cur.fetchone()
 
-            # Get allergies
             cur.execute(
                 "SELECT DISTINCT ingredient FROM allergies WHERE user_id = ?",
                 (user_id,),
@@ -84,143 +91,139 @@ def character_builder():
             db.close()
 
     if request.method == "POST":
+        data = get_request_data()
         user_id = session["user_id"]
 
-        # ---------- SKIN DATA ----------
-        skin_type = request.form["skin_type"]
-        skin_color = request.form["skin_color"]
-        skin_problems = ",".join(request.form.getlist("skin_problems"))
-        sensitivity_level = request.form["sensitivity_level"]
-
-        # Helper to map 1-3 to Low/Med/High or Mild/Mod/Sev
-        def map_level(value, type="intensity"):
+        def map_level(value, kind="intensity"):
             if not value:
                 return None
             try:
-                val_int = int(value)
-                if type == "intensity":  # Low, Medium, High
-                    return {1: "Low", 2: "Medium", 3: "High"}.get(val_int, value)
-                elif type == "severity":  # Mild, Moderate, Severe
-                    return {1: "Mild", 2: "Moderate", 3: "Severe"}.get(val_int, value)
+                numeric_value = int(value)
+                if kind == "intensity":
+                    return {1: "Low", 2: "Medium", 3: "High"}.get(
+                        numeric_value, value
+                    )
+                if kind == "severity":
+                    return {1: "Mild", 2: "Moderate", 3: "Severe"}.get(
+                        numeric_value, value
+                    )
             except ValueError:
                 return value
             return value
 
-        # New Skin Fields
-        oil_level = map_level(request.form.get("oil_level"), "intensity")
-        acne_presence = request.form.get("acne_presence")
+        skin_type = data.get("skin_type", "")
+        skin_color = data.get("skin_color", "")
+        skin_problems = ",".join(get_request_list("skin_problems"))
+        sensitivity_level = data.get("sensitivity_level", "")
+        oil_level = map_level(data.get("oil_level"), "intensity")
+        acne_presence = data.get("acne_presence")
         acne_level = (
-            map_level(request.form.get("acne_level"), "severity")
+            map_level(data.get("acne_level"), "severity")
             if acne_presence == "Yes"
             else None
         )
-        dryness_presence = request.form.get("dryness_presence")
+        dryness_presence = data.get("dryness_presence")
         dryness_level = (
-            map_level(request.form.get("dryness_level"), "severity")
+            map_level(data.get("dryness_level"), "severity")
             if dryness_presence == "Yes"
             else None
         )
-        lifestyle = request.form.get("lifestyle")
+        lifestyle = data.get("lifestyle")
 
-        # ---------- HAIR DATA ----------
-        hair_type = request.form["hair_type"]
-        hair_color = request.form["hair_color"]
-        hair_problems = ",".join(request.form.getlist("hair_problems"))
-        scalp_condition = request.form["scalp_condition"]
-
-        # New Hair Fields
-        hair_fall_level = map_level(request.form.get("hair_fall_level"), "intensity")
-        hair_dryness_presence = request.form.get("hair_dryness_presence")
+        hair_type = data.get("hair_type", "")
+        hair_color = data.get("hair_color", "")
+        hair_problems = ",".join(get_request_list("hair_problems"))
+        scalp_condition = data.get("scalp_condition", "")
+        hair_fall_level = map_level(data.get("hair_fall_level"), "intensity")
+        hair_dryness_presence = data.get("hair_dryness_presence")
         hair_dryness_level = (
-            map_level(request.form.get("hair_dryness_level"), "severity")
+            map_level(data.get("hair_dryness_level"), "severity")
             if hair_dryness_presence == "Yes"
             else None
         )
-        scalp_itch_presence = request.form.get("scalp_itch_presence")
+        scalp_itch_presence = data.get("scalp_itch_presence")
         scalp_itch_level = (
-            map_level(request.form.get("scalp_itch_level"), "severity")
+            map_level(data.get("scalp_itch_level"), "severity")
             if scalp_itch_presence == "Yes"
             else None
         )
-
-        # ---------- ALLERGIES ----------
-        allergies = request.form.getlist("allergies")
+        allergies = get_request_list("allergies")
 
         db = get_db()
+        try:
+            if "name" in session:
+                user_name = session["name"]
+            else:
+                cur = db.cursor()
+                cur.execute("SELECT name FROM users WHERE id = ?", (user_id,))
+                user_name = cur.fetchone()[0]
 
-        if "name" in session:
-            user_name = session["name"]
-        else:
-            # Fallback if name not in session (fetch from DB)
             cur = db.cursor()
-            cur.execute("SELECT name FROM users WHERE id = ?", (user_id,))
-            user_name = cur.fetchone()[0]
-
-        cur = db.cursor()
-
-        # Insert skin profile
-        cur.execute(
-            """
-            INSERT INTO skin_profile 
-            (user_id, name, skin_type, skin_color, skin_problems, sensitivity_level, 
-             oil_level, acne_presence, acne_level, dryness_presence, dryness_level, lifestyle)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-            (
-                user_id,
-                user_name,
-                skin_type,
-                skin_color,
-                skin_problems,
-                sensitivity_level,
-                oil_level,
-                acne_presence,
-                acne_level,
-                dryness_presence,
-                dryness_level,
-                lifestyle,
-            ),
-        )
-
-        # Insert hair profile
-        cur.execute(
-            """
-            INSERT INTO hair_profile
-            (user_id, name, hair_type, hair_color, hair_problems, scalp_condition,
-             hair_fall_level, dryness_presence, dryness_level, scalp_itch_presence, scalp_itch_level)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-            (
-                user_id,
-                user_name,
-                hair_type,
-                hair_color,
-                hair_problems,
-                scalp_condition,
-                hair_fall_level,
-                hair_dryness_presence,
-                hair_dryness_level,
-                scalp_itch_presence,
-                scalp_itch_level,
-            ),
-        )
-
-        # Insert allergies (multi-select)
-        for item in allergies:
             cur.execute(
                 """
-                INSERT INTO allergies (user_id, name, ingredient)
-                VALUES (?, ?, ?)
-            """,
-                (user_id, user_name, item),
+                INSERT INTO skin_profile
+                (user_id, name, skin_type, skin_color, skin_problems, sensitivity_level,
+                 oil_level, acne_presence, acne_level, dryness_presence, dryness_level, lifestyle)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    user_id,
+                    user_name,
+                    skin_type,
+                    skin_color,
+                    skin_problems,
+                    sensitivity_level,
+                    oil_level,
+                    acne_presence,
+                    acne_level,
+                    dryness_presence,
+                    dryness_level,
+                    lifestyle,
+                ),
             )
 
-        db.commit()
-        db.close()
+            cur.execute(
+                """
+                INSERT INTO hair_profile
+                (user_id, name, hair_type, hair_color, hair_problems, scalp_condition,
+                 hair_fall_level, dryness_presence, dryness_level, scalp_itch_presence, scalp_itch_level)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    user_id,
+                    user_name,
+                    hair_type,
+                    hair_color,
+                    hair_problems,
+                    scalp_condition,
+                    hair_fall_level,
+                    hair_dryness_presence,
+                    hair_dryness_level,
+                    scalp_itch_presence,
+                    scalp_itch_level,
+                ),
+            )
+
+            for item in allergies:
+                cur.execute(
+                    """
+                    INSERT INTO allergies (user_id, name, ingredient)
+                    VALUES (?, ?, ?)
+                    """,
+                    (user_id, user_name, item),
+                )
+
+            db.commit()
+        except Exception as e:
+            if is_api_request:
+                return {"success": False, "error": f"Failed to save profile: {str(e)}"}, 500
+            flash(f"Failed to save profile: {str(e)}", "error")
+            return redirect(url_for("character_builder.character_builder"))
+        finally:
+            db.close()
 
         session["profile_complete"] = True
 
-        # Cache Invalidation: Delete existing recommendation file if it exists
         cache_file = os.path.join("AI_generated_json_file", f"{user_id}.json")
         if os.path.exists(cache_file):
             try:
@@ -228,9 +231,16 @@ def character_builder():
             except OSError as e:
                 print(f"Error removing cache file: {e}")
 
-        flash("Profile updated successfully!", "success")
-        # Reset the flag so user must click Edit Profile button again
         session.pop("can_edit_profile", None)
+
+        if is_api_request:
+            return {
+                "success": True,
+                "message": "Profile updated successfully!",
+                "redirect": url_for("recommendation.recommendation"),
+            }
+
+        flash("Profile updated successfully!", "success")
         return redirect(url_for("recommendation.recommendation"))
 
     return render_template("character_builder.html", existing_profile=existing_profile)

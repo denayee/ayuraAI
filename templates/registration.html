@@ -18,7 +18,7 @@
             {% endif %}
         {% endwith %}
 
-        <form action="{{ url_for('register.register') }}" method="POST" class="auth-form" id="regForm">
+        <form data-endpoint="{{ url_for('register.register') }}" class="auth-form" id="regForm">
             <!-- Step 1: Basic Info -->
             <div id="step-1" class="form-step {% if not error_step or error_step == 1 %}step-active{% else %}step-hidden-left{% endif %}">
                 <div class="form-row" style="grid-template-columns: 1fr;">
@@ -150,7 +150,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if(form) {
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const formData = new FormData(this);
             const alertsDiv = document.getElementById('ajax-alerts');
             alertsDiv.innerHTML = '';
             
@@ -160,32 +159,28 @@ document.addEventListener('DOMContentLoaded', function () {
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch(this.action, {
+                const { response, result } = await window.AyuraApi.jsonRequest(this.dataset.endpoint, {
                     method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    data: window.AyuraApi.formToJson(this),
                 });
-                const data = await response.json();
                 
-                if (data.success) {
-                    window.location.href = data.redirect;
+                if (response.ok && result.success) {
+                    window.location.href = result.redirect;
                 } else {
                     submitBtn.innerText = originalText;
                     submitBtn.disabled = false;
-                    alertsDiv.innerHTML = `<div class="flash-messages"><div class="alert">${data.error}</div></div>`;
+                    alertsDiv.innerHTML = `<div class="flash-messages"><div class="alert">${result.error}</div></div>`;
                     
                     const currentStep = document.querySelector('.form-step.step-active');
                     const currentStepId = parseInt(currentStep.id.split('-')[1]);
                     
-                    if (currentStepId !== data.step) {
-                        goToStep(currentStepId, data.step);
+                    if (currentStepId !== result.step) {
+                        goToStep(currentStepId, result.step);
                     }
                     setTimeout(() => {
-                        if (data.step === 3) document.getElementById('password').focus();
-                        else if (data.step === 2) document.getElementById('email').focus();
-                        else if (data.step === 1) document.getElementById('name').focus();
+                        if (result.step === 3) document.getElementById('password').focus();
+                        else if (result.step === 2) document.getElementById('email').focus();
+                        else if (result.step === 1) document.getElementById('name').focus();
                     }, 300);
                 }
             } catch (err) {

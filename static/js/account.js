@@ -22,19 +22,18 @@ async function saveName() {
     saveBtn.disabled = true;
 
     try {
-        const res = await fetch(window.UPDATE_NAME_URL, {
+        const { response, result } = await window.AyuraApi.jsonRequest(window.UPDATE_NAME_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: newName })
+            data: { name: newName },
         });
-        const data = await res.json();
-        if (data.success) {
-            document.getElementById('name-text').textContent = data.name;
-            document.getElementById('header-name-text').textContent = data.name;
-            document.querySelector('.account-avatar').textContent = data.name[0].toUpperCase();
+
+        if (response.ok && result.success) {
+            document.getElementById('name-text').textContent = result.name;
+            document.getElementById('header-name-text').textContent = result.name;
+            document.querySelector('.account-avatar').textContent = result.name[0].toUpperCase();
             cancelEditName();
         } else {
-            alert(data.error || 'Failed to update name');
+            alert(result.error || 'Failed to update name');
         }
     } catch (err) {
         alert('Network error. Please try again.');

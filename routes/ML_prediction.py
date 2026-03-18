@@ -1,6 +1,6 @@
 import pickle
 import pandas as pd
-from flask import Blueprint, request, render_template
+from flask import Blueprint, request, render_template, jsonify
 
 prediction_bp = Blueprint("prediction", __name__)
 
@@ -20,40 +20,45 @@ products = pd.read_csv("Generated_data/product_dataset_cleaned.csv")
 # ------------------------------
 @prediction_bp.route("/predict", methods=["POST"])
 def predict():
+    payload = request.get_json(silent=True) or {}
+    form_data = payload if request.is_json else request.form
+
+    def value(name, default=0):
+        return int(form_data.get(name, default))
 
     # -------- Skin Features --------
     skin_features = [
-        int(request.form["Skin_Color"]),
-        int(request.form["Skin_Problems"]),
-        int(request.form["Skin_Sensitivity"]),
-        int(request.form["Skin_Oil_Level"]),
-        int(request.form["Acne"]),
-        int(request.form["Skin_Dryness"]),
-        int(request.form["Lifestyle"]),
-        int(request.form["Age"]),
+        value("Skin_Color"),
+        value("Skin_Problems"),
+        value("Skin_Sensitivity"),
+        value("Skin_Oil_Level"),
+        value("Acne"),
+        value("Skin_Dryness"),
+        value("Lifestyle"),
+        value("Age"),
     ]
 
     # -------- Hair Features --------
     hair_features = [
-        int(request.form["Scalp_Itch"]),
-        int(request.form["Hair_Dryness"]),
-        int(request.form["Hair_Fall"]),
-        int(request.form["Scalp_Condition"]),
-        int(request.form["Hair_Problems"]),
-        int(request.form["Hair_Color"]),
-        int(request.form["Age"]),
+        value("Scalp_Itch"),
+        value("Hair_Dryness"),
+        value("Hair_Fall"),
+        value("Scalp_Condition"),
+        value("Hair_Problems"),
+        value("Hair_Color"),
+        value("Age"),
     ]
 
     # -------- Allergy Features --------
     allergy_features = [
-        int(request.form["Fragrance_Allergy"]),
-        int(request.form["Alcohol_Allergy"]),
-        int(request.form["Paraben_Allergy"]),
-        int(request.form["Sulfate_Allergy"]),
-        int(request.form["Herbal_Allergy"]),
-        int(request.form["Nut_Allergy"]),
-        int(request.form["Skin_Sensitivity"]),
-        int(request.form["Age"]),
+        value("Fragrance_Allergy"),
+        value("Alcohol_Allergy"),
+        value("Paraben_Allergy"),
+        value("Sulfate_Allergy"),
+        value("Herbal_Allergy"),
+        value("Nut_Allergy"),
+        value("Skin_Sensitivity"),
+        value("Age"),
     ]
 
     # -------- Predictions --------
@@ -79,23 +84,34 @@ def predict():
     ]
 
     # Allergy Filtering
-    if int(request.form["Fragrance_Allergy"]) == 1:
+    if value("Fragrance_Allergy") == 1:
         recommended_products = recommended_products[
             recommended_products["Fragrance_Free"] == 1
         ]
 
-    if int(request.form["Paraben_Allergy"]) == 1:
+    if value("Paraben_Allergy") == 1:
         recommended_products = recommended_products[
             recommended_products["Paraben_Free"] == 1
         ]
 
-    if int(request.form["Alcohol_Allergy"]) == 1:
+    if value("Alcohol_Allergy") == 1:
         recommended_products = recommended_products[
             recommended_products["Alcohol_Free"] == 1
         ]
 
     # Select top 5 products
     recommended_products = recommended_products.head(5)
+
+    if request.is_json:
+        return jsonify(
+            {
+                "success": True,
+                "skin": skin_prediction,
+                "hair": hair_prediction,
+                "allergy": allergy_severity,
+                "products": recommended_products.to_dict(orient="records"),
+            }
+        )
 
     return render_template(
         "ai_recomadation.html",

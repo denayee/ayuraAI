@@ -3,10 +3,11 @@
 
 <div class="auth-container">
     <div class="auth-card">
-        <div class="cute-form-greeting">Hehe 🌸 Missed you!</div>
-        <h2>Welcome Back</h2>
+        <div class="cute-form-greeting">Welcome back</div>
+        <h2>Login</h2>
         <p>Login to access your personalized recommendations</p>
-        
+        <div id="login-alerts"></div>
+
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <div class="flash-messages">
@@ -17,12 +18,12 @@
             {% endif %}
         {% endwith %}
 
-        <form action="{{ url_for('login.login') }}" method="POST" class="auth-form">
+        <form id="loginForm" data-endpoint="{{ url_for('login.login') }}" class="auth-form">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required placeholder="Enter your email">
             </div>
-            
+
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
@@ -52,9 +53,43 @@
 </div>
 
 <script>
-// mark page as auth so CSS background applies
 document.addEventListener('DOMContentLoaded', function () {
     document.body.classList.add('has-auth-bg');
+
+    const form = document.getElementById('loginForm');
+    const alerts = document.getElementById('login-alerts');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+
+    function showAlert(message) {
+        alerts.innerHTML = `<div class="flash-messages"><div class="alert">${message}</div></div>`;
+    }
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        alerts.innerHTML = '';
+        submitButton.disabled = true;
+        submitButton.textContent = 'Logging In...';
+
+        try {
+            const { response, result } = await window.AyuraApi.jsonRequest(form.dataset.endpoint, {
+                method: 'POST',
+                data: window.AyuraApi.formToJson(form),
+            });
+
+            if (response.ok && result.success) {
+                window.location.href = result.redirect;
+                return;
+            }
+
+            showAlert(result.error || 'Login failed. Please try again.');
+        } catch (error) {
+            showAlert('Unable to connect right now. Please try again.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        }
+    });
 });
 </script>
 

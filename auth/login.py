@@ -1,11 +1,11 @@
-from flask import Blueprint, request, session, render_template, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from dotenv import load_dotenv
 from database import get_db
 import secrets
 from datetime import datetime, timedelta
-import os
 from routes.email_handler import send_password_reset_email
+from request_helpers import get_request_data, wants_json_response
 
 login_bp = Blueprint("login", __name__)
 
@@ -16,16 +16,19 @@ load_dotenv()
 def login():
     if "user_id" in session:
         return redirect(url_for("recommendation.recommendation"))
+
     if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
+        is_api_request = wants_json_response()
+        data = get_request_data()
+        email = data.get("email", "").strip()
+        password = data.get("password", "")
 
         db = get_db()
         try:
             cur = db.cursor()
-            # Allow login via either email or username
             cur.execute(
-                "SELECT id, name, password, gender, is_admin FROM users WHERE email=? OR username=?", (email, email)
+                "SELECT id, name, password, gender, is_admin, age FROM users WHERE email=? OR username=?",
+                (email, email),
             )
             user = cur.fetchone()
 
@@ -34,8 +37,8 @@ def login():
                 session["name"] = user[1]
                 session["gender"] = user[3] if user[3] else "Not specified"
                 session["is_admin"] = bool(user[4])
+                session["age"] = user[5] if user[5] else 25
 
-                # Check if profile is complete (shared logic)
                 cur.execute(
                     "SELECT COUNT(*) FROM skin_profile WHERE user_id = ?", (user[0],)
                 )
@@ -46,16 +49,40 @@ def login():
                 hair_exists = cur.fetchone()[0] > 0
                 session["profile_complete"] = skin_exists and hair_exists
 
-                flash("Welcome to AyuraAI Control Center! 🛡️" if session["is_admin"] else "Welcome back 🌸 Let's glow!", "success")
-                
-                # Redirect admins to dashboard, others to recommendations
-                if session["is_admin"]:
-                    return redirect(url_for("admin.dashboard"))
-                return redirect(url_for("recommendation.recommendation"))
-            else:
-                flash("Invalid email or password", "error")
-                return redirect(url_for("login.login"))
+                redirect_url = (
+                    url_for("admin.dashboard")
+                    if session["is_admin"]
+                    else url_for("recommendation.recommendation")
+                )
+
+                if is_api_request:
+                    return {
+                        "success": True,
+                        "message": (
+                            "Welcome to AyuraAI Control Center!"
+                            if session["is_admin"]
+                            else "Welcome back! Let's glow!"
+                        ),
+                        "redirect": redirect_url,
+                        "is_admin": session["is_admin"],
+                    }
+
+                flash(
+                    "Welcome to AyuraAI Control Center!"
+                    if session["is_admin"]
+                    else "Welcome back! Let's glow!",
+                    "success",
+                )
+                return redirect(redirect_url)
+
+            if is_api_request:
+                return {"success": False, "error": "Invalid email or password"}, 401
+
+            flash("Invalid email or password", "error")
+            return redirect(url_for("login.login"))
         except Exception as e:
+            if is_api_request:
+                return {"success": False, "error": f"An error occurred: {str(e)}"}, 500
             flash(f"An error occurred: {str(e)}", "error")
             return redirect(url_for("login.login"))
         finally:
@@ -74,7 +101,10 @@ def logout():
 @login_bp.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
-        email = request.form["email"]
+        is_api_request = wants_json_response()
+        data = get_request_data()
+        email = data.get("email", "").strip()
+
         db = get_db()
         try:
             cur = db.cursor()
@@ -90,17 +120,31 @@ def forgot_password():
                 )
                 db.commit()
 
-                # Send reset email via utility
                 reset_url = url_for("login.reset_password", token=token, _external=True)
                 if send_password_reset_email(email, reset_url):
-                    flash("Reset link sent! Please check your email.", "success")
+                    message = "Reset link sent! Please check your email."
+                    if is_api_request:
+                        return {"success": True, "message": message}
+                    flash(message, "success")
                 else:
-                    flash("Failed to send email. There might be a configuration issue.", "error")
+                    error_message = (
+                        "Failed to send email. There might be a configuration issue."
+                    )
+                    if is_api_request:
+                        return {"success": False, "error": error_message}, 500
+                    flash(error_message, "error")
             else:
-                flash("If that email exists in our system, you will receive a reset link.", "info")
-            
+                info_message = (
+                    "If that email exists in our system, you will receive a reset link."
+                )
+                if is_api_request:
+                    return {"success": True, "message": info_message}
+                flash(info_message, "info")
+
             return redirect(url_for("login.login"))
         except Exception as e:
+            if is_api_request:
+                return {"success": False, "error": f"An error occurred: {str(e)}"}, 500
             flash(f"An error occurred: {str(e)}", "error")
         finally:
             db.close()
@@ -110,6 +154,7 @@ def forgot_password():
 
 @login_bp.route("/reset-password/<token>", methods=["GET", "POST"])
 def reset_password(token):
+    is_api_request = wants_json_response()
     db = get_db()
     try:
         cur = db.cursor()
@@ -120,14 +165,19 @@ def reset_password(token):
         user = cur.fetchone()
 
         if not user:
+            if is_api_request:
+                return {"success": False, "error": "Invalid or expired reset token."}, 400
             flash("Invalid or expired reset token.", "error")
             return redirect(url_for("login.forgot_password"))
 
         if request.method == "POST":
-            password = request.form["password"]
-            confirm_password = request.form["confirm_password"]
+            data = get_request_data()
+            password = data.get("password", "")
+            confirm_password = data.get("confirm_password", "")
 
             if password != confirm_password:
+                if is_api_request:
+                    return {"success": False, "error": "Passwords do not match."}, 400
                 flash("Passwords do not match.", "error")
                 return render_template("reset_password.html", token=token)
 
@@ -138,10 +188,19 @@ def reset_password(token):
             )
             db.commit()
 
+            if is_api_request:
+                return {
+                    "success": True,
+                    "message": "Password updated successfully! You can now login.",
+                    "redirect": url_for("login.login"),
+                }
+
             flash("Password updated successfully! You can now login.", "success")
             return redirect(url_for("login.login"))
 
     except Exception as e:
+        if is_api_request:
+            return {"success": False, "error": f"An error occurred: {str(e)}"}, 500
         flash(f"An error occurred: {str(e)}", "error")
     finally:
         db.close()

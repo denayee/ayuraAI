@@ -1,7 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from database import get_db
 from datetime import datetime
-from routes.email_handler import send_contact_confirmation_email, send_webinar_registration_email
+from routes.email_handler import (
+    send_contact_confirmation_email,
+    send_webinar_registration_email,
+)
+from request_helpers import get_request_data, wants_json_response
 
 pages_bp = Blueprint("pages", __name__)
 
@@ -19,9 +23,11 @@ def why_ayuraai():
 @pages_bp.route("/user-stories", methods=["GET", "POST"])
 def user_stories():
     if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        description = request.form.get("description")
+        is_api_request = wants_json_response()
+        data = get_request_data()
+        name = data.get("name", "").strip()
+        email = data.get("email", "").strip()
+        description = data.get("description", "").strip()
         user_id = session.get("user_id")
 
         errors = {}
@@ -30,13 +36,15 @@ def user_stories():
         if not email or "@" not in email:
             errors["email"] = "Please enter a valid email address."
         if not description or len(description) < 20:
-            errors["description"] = "Story description must be at least 20 characters long."
+            errors["description"] = (
+                "Story description must be at least 20 characters long."
+            )
 
         if errors:
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if is_api_request:
                 return jsonify({"success": False, "errors": errors}), 400
-            for field, msg in errors.items():
-                flash(msg, "error")
+            for _, message in errors.items():
+                flash(message, "error")
             return redirect(url_for("pages.user_stories"))
 
         db = get_db()
@@ -44,14 +52,25 @@ def user_stories():
             cur = db.cursor()
             cur.execute(
                 "INSERT INTO user_stories (user_id, name, email, description, created_at) VALUES (?, ?, ?, ?, ?)",
-                (user_id, name, email, description, datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                (
+                    user_id,
+                    name,
+                    email,
+                    description,
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                ),
             )
             db.commit()
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify({"success": True, "message": "Thank you for sharing your story! It has been submitted for review. ✨"})
-            flash("Thank you for sharing your story! ✨", "success")
+            if is_api_request:
+                return jsonify(
+                    {
+                        "success": True,
+                        "message": "Thank you for sharing your story! It has been submitted for review.",
+                    }
+                )
+            flash("Thank you for sharing your story!", "success")
         except Exception as e:
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if is_api_request:
                 return jsonify({"success": False, "error": str(e)}), 500
             flash(f"An error occurred: {str(e)}", "error")
         finally:
@@ -63,13 +82,14 @@ def user_stories():
     stories = []
     try:
         cur = db.cursor()
-        # Use a LEFT JOIN to check if the user exists in the users table
-        cur.execute("""
+        cur.execute(
+            """
             SELECT s.name, s.description, s.created_at, u.id as user_exists
             FROM user_stories s
             LEFT JOIN users u ON s.user_id = u.id OR s.email = u.email
             ORDER BY s.created_at DESC
-        """)
+            """
+        )
         stories = cur.fetchall()
     except Exception as e:
         print(f"Error fetching stories: {e}")
@@ -87,9 +107,11 @@ def guides():
 @pages_bp.route("/webinars", methods=["GET", "POST"])
 def webinars():
     if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        topic = request.form.get("topic", "AI in Modern Dermatology")
+        is_api_request = wants_json_response()
+        data = get_request_data()
+        name = data.get("name", "").strip()
+        email = data.get("email", "").strip()
+        topic = data.get("topic", "AI in Modern Dermatology").strip()
         user_id = session.get("user_id")
 
         errors = {}
@@ -99,36 +121,46 @@ def webinars():
             errors["email"] = "Please enter a valid email address."
 
         if errors:
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if is_api_request:
                 return jsonify({"success": False, "errors": errors}), 400
-            for field, msg in errors.items():
-                flash(msg, "error")
+            for _, message in errors.items():
+                flash(message, "error")
             return redirect(url_for("pages.webinars"))
 
         db = get_db()
         try:
             cur = db.cursor()
-            webinar_id = request.form.get("webinar_id")
+            webinar_id = data.get("webinar_id")
             if webinar_id:
                 webinar_id = int(webinar_id)
             cur.execute(
                 "INSERT INTO webinar_registrations (user_id, name, email, webinar_topic, webinar_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                (user_id, name, email, topic, webinar_id, datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                (
+                    user_id,
+                    name,
+                    email,
+                    topic,
+                    webinar_id,
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                ),
             )
             db.commit()
 
-            # --- Webinar Registration Email ---
             try:
                 send_webinar_registration_email(email, name, topic)
             except Exception as email_err:
                 print(f"Error sending webinar registration email: {email_err}")
-            # ----------------------------------
 
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify({"success": True, "message": "Successfully registered for the webinar! We'll send you the link soon. 🚀"})
-            flash("Successfully registered! 🚀", "success")
+            if is_api_request:
+                return jsonify(
+                    {
+                        "success": True,
+                        "message": "Successfully registered for the webinar! We'll send you the link soon.",
+                    }
+                )
+            flash("Successfully registered!", "success")
         except Exception as e:
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if is_api_request:
                 return jsonify({"success": False, "error": str(e)}), 500
             flash(f"An error occurred: {str(e)}", "error")
         finally:
@@ -163,10 +195,12 @@ def partners():
 @pages_bp.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        phone = request.form.get("phone")
-        message = request.form.get("message")
+        is_api_request = wants_json_response()
+        data = get_request_data()
+        name = data.get("name", "").strip()
+        email = data.get("email", "").strip()
+        phone = data.get("phone", "").strip()
+        message = data.get("message", "").strip()
         user_id = session.get("user_id")
 
         errors = {}
@@ -180,10 +214,10 @@ def contact():
             errors["message"] = "Message must be at least 10 characters long."
 
         if errors:
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if is_api_request:
                 return jsonify({"success": False, "errors": errors}), 400
-            for field, msg in errors.items():
-                flash(msg, "error")
+            for _, error_message in errors.items():
+                flash(error_message, "error")
             return redirect(url_for("pages.contact"))
 
         db = get_db()
@@ -191,24 +225,33 @@ def contact():
             cur = db.cursor()
             cur.execute(
                 "INSERT INTO support_requests (user_id, name, email, phone, message, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                (user_id, name, email, phone, message, datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                (
+                    user_id,
+                    name,
+                    email,
+                    phone,
+                    message,
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                ),
             )
             db.commit()
 
-            # --- Contact Confirmation Email ---
             try:
-                # Use a snippet of the message (first 100 chars)
                 snippet = message[:100] + "..." if len(message) > 100 else message
                 send_contact_confirmation_email(email, name, snippet)
             except Exception as email_err:
                 print(f"Error sending contact confirmation email: {email_err}")
-            # ----------------------------------
 
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify({"success": True, "message": "Your message has been sent successfully! ✨"})
-            flash("Your message has been sent successfully! ✨", "success")
+            if is_api_request:
+                return jsonify(
+                    {
+                        "success": True,
+                        "message": "Your message has been sent successfully!",
+                    }
+                )
+            flash("Your message has been sent successfully!", "success")
         except Exception as e:
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if is_api_request:
                 return jsonify({"success": False, "error": str(e)}), 500
             flash(f"An error occurred: {str(e)}", "error")
         finally:

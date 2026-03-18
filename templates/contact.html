@@ -7,7 +7,7 @@
     <p class="contact-subtitle">We'd love to hear from you. Send us a message and we'll reply shortly.</p>
 
     <section class="contact-card">
-        <form id="ajax-contact-form" action="{{ url_for('pages.contact') }}" method="POST" class="contact-form">
+        <form id="ajax-contact-form" data-endpoint="{{ url_for('pages.contact') }}" class="contact-form">
             <div class="form-group">
                 <label for="contact-name">Full Name</label>
                 <input type="text" id="contact-name" name="name" placeholder="John Doe" required>
@@ -84,18 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.error-feedback').forEach(el => el.textContent = '');
         document.querySelectorAll('.form-group input, .form-group textarea').forEach(el => el.classList.remove('field-error'));
         
-        const formData = new FormData(form);
-        
         try {
-            const response = await fetch(form.action, {
+            const { response, result } = await window.AyuraApi.jsonRequest(form.dataset.endpoint, {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                data: window.AyuraApi.formToJson(form),
             });
-            
-            const result = await response.json();
             
             if (response.ok) {
                 showNotification(result.message, 'success');

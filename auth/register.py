@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from database import get_db
 from datetime import datetime
 from routes.email_handler import send_welcome_email
+from request_helpers import get_request_data, wants_json_response
 
 register_bp = Blueprint("register", __name__)
 load_dotenv()
@@ -27,36 +28,37 @@ def register():
     if "user_id" in session:
         return redirect(url_for("recommendation.recommendation"))
     if request.method == "POST":
-        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        is_api_request = wants_json_response()
+        data = get_request_data()
 
-        name = request.form["name"]
-        username = request.form["username"]
-        email = request.form["email"]
-        age = request.form["age"]
-        gender = request.form["gender"]
-        password = request.form["password"]
-        repassword = request.form["repassword"]
+        name = data.get("name", "").strip()
+        username = data.get("username", "").strip()
+        email = data.get("email", "").strip()
+        age = str(data.get("age", "")).strip()
+        gender = data.get("gender", "").strip()
+        password = data.get("password", "")
+        repassword = data.get("repassword", "")
 
         try:
             if int(age) < 18:
-                if is_ajax:
+                if is_api_request:
                     return {
                         "success": False,
                         "error": "You must be 18 or older to register",
                         "step": 2,
-                    }
+                    }, 400
                 flash("Error: You must be 18 or older to register", "error")
-                session["reg_form_data"] = request.form.to_dict()
+                session["reg_form_data"] = dict(data)
                 session["reg_error_step"] = 2
                 return redirect(url_for("register.register"))
         except ValueError:
             pass
 
         if password != repassword:
-            if is_ajax:
-                return {"success": False, "error": "Passwords do not match", "step": 3}
+            if is_api_request:
+                return {"success": False, "error": "Passwords do not match", "step": 3}, 400
             flash("Error: Passwords do not match", "error")
-            session["reg_form_data"] = request.form.to_dict()
+            session["reg_form_data"] = dict(data)
             session["reg_error_step"] = 3
             return redirect(url_for("register.register"))
 
@@ -73,37 +75,40 @@ def register():
             db.commit()
 
             session["user_id"] = user_id
-            session["name"] = (
-                name  # Optimize: Store name in session to avoid extra query in character_builder
-            )
+            session["name"] = name
+            session["age"] = int(age) if age.isdigit() else age
+            session["gender"] = gender
+            session["profile_complete"] = False
+            session["can_edit_profile"] = True
 
             # --- Welcome Email Sending ---
             send_welcome_email(email, name)
             # ---------------------------
 
-            if is_ajax:
+            if is_api_request:
                 return {
                     "success": True,
+                    "message": "Account created successfully!",
                     "redirect": url_for("character_builder.character_builder"),
                 }
             flash("Yayyy 🎉 You're in!", "success")
             return redirect(url_for("character_builder.character_builder"))
         except sqlite3.IntegrityError:
-            if is_ajax:
-                return {"success": False, "error": "Email already exists", "step": 2}
+            if is_api_request:
+                return {"success": False, "error": "Email already exists", "step": 2}, 409
             flash("Error: Email already exists", "error")
-            session["reg_form_data"] = request.form.to_dict()
+            session["reg_form_data"] = dict(data)
             session["reg_error_step"] = 2
             return redirect(url_for("register.register"))
         except Exception as e:
-            if is_ajax:
+            if is_api_request:
                 return {
                     "success": False,
                     "error": f"An error occurred: {str(e)}",
                     "step": 1,
-                }
+                }, 500
             flash(f"An error occurred: {str(e)}", "error")
-            session["reg_form_data"] = request.form.to_dict()
+            session["reg_form_data"] = dict(data)
             session["reg_error_step"] = 1
             return redirect(url_for("register.register"))
         finally:

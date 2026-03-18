@@ -4,70 +4,65 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Tab switching logic with persistence
     window.openTab = (evt, tabName) => {
-        const tabcontent = document.getElementsByClassName("tab-content");
-        for (let i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
+        const tabcontent = document.getElementsByClassName('tab-content');
+        for (let i = 0; i < tabcontent.length; i += 1) {
+            tabcontent[i].style.display = 'none';
         }
-        const tablinks = document.getElementsByClassName("tab-btn");
-        for (let i = 0; i < tablinks.length; i++) {
-            tablinks[i].classList.remove("active");
+
+        const tablinks = document.getElementsByClassName('tab-btn');
+        for (let i = 0; i < tablinks.length; i += 1) {
+            tablinks[i].classList.remove('active');
         }
-        document.getElementById(tabName).style.display = "block";
+
+        document.getElementById(tabName).style.display = 'block';
         if (evt) {
-            evt.currentTarget.classList.add("active");
+            evt.currentTarget.classList.add('active');
         } else {
-            document.querySelector(`[onclick*="'${tabName}'"]`).classList.add("active");
+            document.querySelector(`[onclick*="'${tabName}'"]`).classList.add('active');
         }
         localStorage.setItem('activeAdminTab', tabName);
     };
 
-    // Restore active tab on load
     const lastTab = localStorage.getItem('activeAdminTab') || 'support';
     openTab(null, lastTab);
 
-    // Status update handler
     window.updateStatus = async (id, status) => {
         try {
-            const res = await fetch(`/admin/support/${id}/status`, {
+            const { response } = await window.AyuraApi.jsonRequest(`/admin/support/${id}/status`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({status: status})
+                data: { status },
             });
-            if (res.ok) location.reload();
+            if (response.ok) location.reload();
         } catch (err) {
-            console.error("Status update failed:", err);
+            console.error('Status update failed:', err);
         }
     };
 
-    // Generic entry deletion
     window.deleteEntry = async (type, id) => {
-        if(!confirm(`Are you sure you want to delete this ${type}?`)) return;
+        if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
         try {
-            const res = await fetch(`/admin/${type}/${id}/delete`, {
-                method: 'POST'
+            const { response } = await window.AyuraApi.jsonRequest(`/admin/${type}/${id}/delete`, {
+                method: 'POST',
             });
-            if (res.ok) location.reload();
+            if (response.ok) location.reload();
         } catch (err) {
-            console.error("Deletion failed:", err);
+            console.error('Deletion failed:', err);
         }
     };
 
-    // Webinar registration deletion
     window.deleteWebinarReg = async (id) => {
-        if(!confirm('Are you sure you want to delete this registration?')) return;
+        if (!confirm('Are you sure you want to delete this registration?')) return;
         try {
-            const res = await fetch(`/admin/webinar-reg/${id}/delete`, {
-                method: 'POST'
+            const { response } = await window.AyuraApi.jsonRequest(`/admin/webinar-reg/${id}/delete`, {
+                method: 'POST',
             });
-            if (res.ok) location.reload();
+            if (response.ok) location.reload();
         } catch (err) {
-            console.error("Registration deletion failed:", err);
+            console.error('Registration deletion failed:', err);
         }
     };
 
-    // Toggle registrations view for webinars
     window.toggleRegistrations = (webinarId) => {
         const el = document.getElementById(`regs-${webinarId}`);
         if (el.style.display === 'none' || !el.style.display) {
@@ -77,32 +72,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // AJAX Form Submission for "Schedule New Webinar"
     const webinarForm = document.querySelector('#webinar-manage form');
     if (webinarForm) {
         webinarForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(webinarForm);
+            const submitButton = webinarForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.textContent = 'Scheduling...';
+
             try {
-                const res = await fetch(webinarForm.action, {
+                const { response, result } = await window.AyuraApi.jsonRequest(webinarForm.dataset.endpoint, {
                     method: 'POST',
-                    body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    data: window.AyuraApi.formToJson(webinarForm),
                 });
-                const result = await res.json();
-                if (res.ok) {
-                    showToast(result.message || "Webinar scheduled successfully! 🛰️", "success");
+
+                if (response.ok && result.success) {
+                    showToast(result.message || 'Webinar scheduled successfully!', 'success');
                     setTimeout(() => location.reload(), 1500);
                 } else {
-                    showToast(result.error || "Error scheduling webinar.", "error");
+                    showToast(result.error || 'Error scheduling webinar.', 'error');
                 }
             } catch (err) {
-                showToast("System error. Please try again.", "error");
+                showToast('System error. Please try again.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
             }
         });
     }
 
-    // Toast Notification logic
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.style.cssText = `
@@ -128,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Animations for toast
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideDown {

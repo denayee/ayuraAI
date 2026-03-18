@@ -17,7 +17,7 @@
         <h3 style="color: var(--primary-color); text-align: center; margin-bottom: 30px; font-size: 1.8rem;">✨ Tell Us Your Experience</h3>
         <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Your story helps others understand the power of personalized AI beauty care.</p>
         
-        <form id="ajax-story-form" action="{{ url_for('pages.user_stories') }}" method="POST" class="contact-form" style="max-width: 700px; margin: 0 auto;">
+        <form id="ajax-story-form" data-endpoint="{{ url_for('pages.user_stories') }}" class="contact-form" style="max-width: 700px; margin: 0 auto;">
             <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label for="story-name">Name</label>
@@ -140,18 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.querySelectorAll('.error-feedback').forEach(el => el.textContent = '');
         
-        const formData = new FormData(form);
-        
         try {
-            const response = await fetch(form.action, {
+            const { response, result } = await window.AyuraApi.jsonRequest(form.dataset.endpoint, {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                data: window.AyuraApi.formToJson(form),
             });
-            
-            const result = await response.json();
             
             if (response.ok) {
                 showNotification(result.message, 'success');

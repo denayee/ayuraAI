@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <form action="{{ url_for('character_builder.character_builder') }}" method="POST" class="builder-form" id="character-form">
+        <form data-endpoint="{{ url_for('character_builder.character_builder') }}" class="builder-form" id="character-form">
             
             <!-- SECTION 1: SKIN (STEP 1) -->
             <div class="form-step active" id="step-1">
@@ -449,8 +449,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     const builderForm = document.getElementById('character-form');
     if (builderForm) {
-        builderForm.addEventListener('submit', function() {
-            document.getElementById('generate-loading-overlay').classList.add('active');
+        builderForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const loadingOverlay = document.getElementById('generate-loading-overlay');
+            loadingOverlay.classList.add('active');
+
+            try {
+                const { response, result } = await window.AyuraApi.jsonRequest(builderForm.dataset.endpoint, {
+                    method: 'POST',
+                    data: window.AyuraApi.formToJson(builderForm),
+                });
+
+                if (response.ok && result.success) {
+                    window.location.href = result.redirect;
+                    return;
+                }
+
+                loadingOverlay.classList.remove('active');
+                alert(result.error || 'Failed to save profile.');
+            } catch (error) {
+                loadingOverlay.classList.remove('active');
+                alert('Failed to save profile. Please try again.');
+            }
         });
     }
 });

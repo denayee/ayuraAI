@@ -18,7 +18,6 @@ import os
 import create_db
 
 app = Flask(__name__)
-CORS(app)
 load_dotenv()
 if not os.path.exists("database.db"):
     create_db.create_database()
@@ -33,6 +32,37 @@ app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True") == "True"
 app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_USERNAME")
+
+is_render_environment = os.getenv("RENDER", "").lower() == "true"
+is_production_env = os.getenv("FLASK_ENV", "").lower() == "production"
+default_cookie_secure = "True" if (is_render_environment or is_production_env) else "False"
+app.config["SESSION_COOKIE_SECURE"] = os.getenv("SESSION_COOKIE_SECURE", default_cookie_secure) == "True"
+default_same_site = "None" if app.config["SESSION_COOKIE_SECURE"] else "Lax"
+app.config["SESSION_COOKIE_SAMESITE"] = os.getenv("SESSION_COOKIE_SAMESITE", default_same_site)
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "").split(",")
+    if origin.strip()
+]
+frontend_url = os.getenv("FRONTEND_URL", "").strip()
+if frontend_url and frontend_url not in cors_origins:
+    cors_origins.append(frontend_url)
+if not cors_origins:
+    cors_origins = [
+        "http://localhost:5000",
+        "http://127.0.0.1:5000",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:10000",
+        "http://127.0.0.1:10000",
+        r"https://.*\.netlify\.app",
+    ]
+
+CORS(app, supports_credentials=True, origins=cors_origins)
 
 mail = Mail(app)
 

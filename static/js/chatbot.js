@@ -133,19 +133,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const typingIndicator = showTypingIndicator();
 
         try {
-            const response = await fetch('/api/chat', {
+            const { response, result } = await window.AyuraApi.jsonRequest('/api/chat', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ message })
+                data: { message },
             });
-
-            const data = await response.json();
             
             // Remove typing indicator and add bot response
             typingIndicator.remove();
-            addMessage(data.response, 'bot');
+            if (response.ok) {
+                addMessage(result.response, 'bot');
+            } else {
+                addMessage("I'm sorry, I'm having trouble connecting right now. Please try again later.", 'bot');
+            }
         } catch (error) {
             console.error('Error:', error);
             if (typingIndicator) typingIndicator.remove();
@@ -321,18 +320,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (nameInput) payload.name = nameInput.value.trim();
                 if (emailInput) payload.email = emailInput.value.trim();
 
-                const response = await fetch('/api/support-request', {
+                const { response, result } = await window.AyuraApi.jsonRequest('/api/support-request', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    data: payload,
                 });
-                const data = await response.json();
                 
-                if (data.success) {
+                if (response.ok && result.success) {
                     formDiv.remove();
-                    addMessage(data.message, 'bot');
+                    addMessage(result.message, 'bot');
                 } else {
-                    alert(data.message || "Something went wrong.");
+                    alert(result.message || result.error || "Something went wrong.");
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Submit Request';
                 }
