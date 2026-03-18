@@ -1,4 +1,4 @@
-fetch("https://ayuraai-1.onrender.com/predict", {
+fetch("https://ayuraai.onrender.com/predict", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
